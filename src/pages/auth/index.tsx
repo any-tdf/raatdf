@@ -620,8 +620,6 @@ function Auth() {
 								>
 									{commonLocale.system.copyright}
 								</a>
-								<span style={{ margin: '0 8px' }}>·</span>
-								<span>v{__APP_VERSION__}</span>
 							</Typography.Text>
 						</div>
 					</div>
