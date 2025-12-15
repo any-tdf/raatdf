@@ -7,6 +7,7 @@ import { FEATURE_FLAGS } from '@/config/system';
 import { SUPPORTED_LOCALES } from '@/locales';
 import type { BorderRadius, ContentWidth, MenuLayout, PageTransitionType, TabsStyle, ThemeMode } from '@/store';
 import { useMenuStore } from '@/store/menu-store';
+import { useSystemStore } from '@/store/system-store';
 import type { Locale } from '@/store/types';
 
 const { Text } = Typography;
@@ -323,19 +324,15 @@ interface LanguageSettingProps {
 
 export function LanguageSetting({ locale, borderRadius, title }: LanguageSettingProps) {
 	const { loadMenuData } = useMenuStore();
+	const { setLocale } = useSystemStore();
 
 	if (!FEATURE_FLAGS.language) return null;
 
 	const handleLanguageChange = (newLocale: Locale) => {
-		const storageKey = 'app-system-preferences';
-		const currentState = localStorage.getItem(storageKey);
-		if (currentState) {
-			const parsedState = JSON.parse(currentState);
-			parsedState.state.locale = newLocale;
-			localStorage.setItem(storageKey, JSON.stringify(parsedState));
-		}
+		// 使用 Zustand store 的 setLocale 方法
+		setLocale(newLocale);
+		// 重新加载菜单数据
 		loadMenuData(newLocale);
-		window.location.reload();
 	};
 
 	return (
