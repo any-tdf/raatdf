@@ -1,0 +1,780 @@
+@import "tailwindcss";
+@import "remixicon/fonts/remixicon.css";
+
+/* ========================================
+   Tailwind CSS v4 配置
+   ========================================
+   本文件使用 Tailwind CSS v4 的 @theme 指令
+   来定义自定义主题配置、动画和其他主题变量。
+   ======================================== */
+
+@theme {
+	/* 动画配置 - 包含已使用和可能用到的动画 */
+	--animate-spin-hover: spin-hover 0.6s ease-in-out;
+	--animate-wiggle: wiggle 0.5s ease-in-out;
+	--animate-wiggle-fast: wiggle 0.3s ease-in-out;
+	--animate-scale-pulse: scale-pulse 0.6s ease-in-out;
+	--animate-scale-bounce: scale-bounce 0.4s ease-out;
+	--animate-heartbeat: heartbeat 0.8s ease-in-out;
+	--animate-tada: tada 0.8s ease-in-out;
+	--animate-bounce-y: bounce-y 0.5s ease-in-out;
+	--animate-swing: swing 0.6s ease-in-out;
+	--animate-hop: hop 0.3s ease-out;
+	--animate-shake: shake 0.4s ease-in-out;
+	--animate-rubber-band: rubber-band 0.6s ease-in-out;
+}
+
+/* ========================================
+   全局基础样式
+   ========================================
+   整个应用程序的基础样式。
+   ======================================== */
+
+/* 确保全局背景色和文字颜色正确 */
+html,
+body {
+	min-height: 100vh;
+	background-color: var(--ant-color-bg-container);
+	color: var(--ant-color-text);
+}
+
+/* 防止页面级滚动，只允许内容区域滚动 */
+html,
+body {
+	overflow: hidden;
+}
+
+/* ========================================
+   滚动条样式
+   ========================================
+   所有元素的统一滚动条样式。
+   ======================================== */
+
+/* 全局滚动条样式 */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+
+*::-webkit-scrollbar {
+	width: 6px;
+	height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.08);
+	border-radius: 3px;
+	transition: background-color 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 深色模式滚动条样式 */
+html.dark *::-webkit-scrollbar-thumb {
+	background-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark *::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(255, 255, 255, 0.15);
+}
+
+html.dark {
+	scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* 内容区域滚动条样式 */
+.ant-layout-content {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+
+.ant-layout-content::-webkit-scrollbar {
+	width: 6px;
+	height: 4px;
+}
+
+.ant-layout-content::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.ant-layout-content::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.08);
+	border-radius: 3px;
+}
+
+.ant-layout-content::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 可滚动元素 */
+[style*="overflow: auto"] {
+	scrollbar-width: thin;
+	scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+
+[style*="overflow: auto"]::-webkit-scrollbar {
+	width: 6px;
+	height: 4px;
+}
+
+[style*="overflow: auto"]::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+[style*="overflow: auto"]::-webkit-scrollbar-thumb {
+	background-color: rgba(0, 0, 0, 0.08);
+	border-radius: 3px;
+}
+
+[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 隐藏标签页区域的水平滚动条 */
+.tabs-scroll-container {
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE 和 Edge */
+}
+
+.tabs-scroll-container::-webkit-scrollbar {
+	display: none; /* Chrome、Safari 和 Opera */
+}
+
+/* ========================================
+   颜色方案
+   ========================================
+   深色模式颜色方案配置。
+   ======================================== */
+
+html.dark {
+	color-scheme: dark;
+}
+
+/* ========================================
+   菜单样式
+   ========================================
+   导航菜单的自定义样式。
+   ======================================== */
+
+/* 移除水平菜单项的底部边框 */
+.ant-menu-horizontal .ant-menu-item-selected::after,
+.ant-menu-horizontal .ant-menu-item:hover::after {
+	border-bottom: none !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected {
+	border-bottom: none !important;
+}
+
+/* 隐藏水平菜单顶级菜单项的箭头 */
+.horizontal-menu-no-arrow > .ant-menu-item-group,
+.horizontal-menu-no-arrow > .ant-menu-item,
+.horizontal-menu-no-arrow > .ant-menu-submenu {
+	display: flex;
+	align-items: center;
+}
+
+.horizontal-menu-no-arrow > .ant-menu-submenu > .ant-menu-submenu-title .ant-menu-submenu-arrow {
+	display: none !important;
+}
+
+/* 完全移除水平菜单底部边框 */
+.horizontal-menu-no-arrow .ant-menu-item::after,
+.horizontal-menu-no-arrow .ant-menu-item:hover::after,
+.horizontal-menu-no-arrow .ant-menu-item-selected::after,
+.horizontal-menu-no-arrow .ant-menu-item-active::after,
+.horizontal-menu-no-arrow .ant-menu-submenu-title::after,
+.horizontal-menu-no-arrow .ant-menu-submenu-title:hover::after,
+.horizontal-menu-no-arrow .ant-menu-submenu-selected::after {
+	display: none !important;
+	border: none !important;
+	width: 0 !important;
+	height: 0 !important;
+	opacity: 0 !important;
+	transform: scale(0) !important;
+	transition: none !important;
+	animation: none !important;
+}
+
+/* 移除菜单项的边框 */
+.horizontal-menu-no-arrow .ant-menu-item,
+.horizontal-menu-no-arrow .ant-menu-item:hover,
+.horizontal-menu-no-arrow .ant-menu-item-selected,
+.horizontal-menu-no-arrow .ant-menu-item-active,
+.horizontal-menu-no-arrow .ant-menu-submenu,
+.horizontal-menu-no-arrow .ant-menu-submenu:hover,
+.horizontal-menu-no-arrow .ant-menu-submenu-selected {
+	border-bottom: none !important;
+}
+
+/* 移除菜单容器的边框 */
+.horizontal-menu-no-arrow {
+	border-bottom: none !important;
+	box-shadow: none !important;
+}
+
+/* 移除垂直菜单的右边框 */
+.ant-menu-light.ant-menu-root.ant-menu-inline,
+.ant-menu-light > .ant-menu.ant-menu-root.ant-menu-inline,
+.ant-menu-light.ant-menu-root.ant-menu-vertical,
+.ant-menu-light > .ant-menu.ant-menu-root.ant-menu-vertical {
+	border-inline-end: none !important;
+}
+
+/* 菜单项圆角 - 使用全局圆角设置 */
+.ant-menu-item,
+.ant-menu-submenu-title {
+	border-radius: var(--menu-item-border-radius, 8px) !important;
+}
+
+/* 对齐菜单项图标和文字 */
+.ant-menu-item,
+.ant-menu-submenu-title {
+	display: flex !important;
+	align-items: center !important;
+}
+
+.ant-menu-item .ant-menu-item-icon,
+.ant-menu-submenu-title .ant-menu-item-icon,
+.ant-menu-submenu-title .ant-menu-submenu-arrow {
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	line-height: 1 !important;
+}
+
+.ant-menu-item .ant-menu-item-icon > *,
+.ant-menu-submenu-title .ant-menu-item-icon > * {
+	line-height: 1 !important;
+	vertical-align: middle !important;
+}
+
+.ant-menu-title-content {
+	display: inline-flex !important;
+	align-items: center !important;
+	line-height: 1.5 !important;
+}
+
+/* 折叠时居中菜单项和图标 */
+.ant-menu-inline.ant-menu-collapsed {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.ant-menu-collapsed .ant-menu-item,
+.ant-menu-collapsed .ant-menu-submenu-title {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	width: 100%;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40px;
+}
+
+.ant-menu-collapsed .ant-menu-item-icon,
+.ant-menu-collapsed .ant-menu-submenu-title-icon {
+	margin-right: 0;
+	margin-left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.ant-menu-collapsed .ant-menu-title-content {
+	display: none;
+}
+
+/* ========================================
+   按钮图标样式
+   ========================================
+   修复按钮中图标的对齐问题。
+   ======================================== */
+
+.ant-btn .ant-btn-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+	height: auto;
+}
+
+.ant-btn .ant-btn-icon > * {
+	line-height: 1;
+}
+
+/* ========================================
+   页面过渡动画
+   ========================================
+   路由切换时的页面过渡动画。
+   ======================================== */
+
+/* 页面过渡类 */
+.page-transition-fade {
+	animation: pageFadeIn 300ms ease-out;
+}
+
+.page-transition-slide-left {
+	animation: pageSlideInLeft 300ms ease-out;
+}
+
+.page-transition-slide-up {
+	animation: pageSlideInUp 300ms ease-out;
+}
+
+.page-transition-slide-down {
+	animation: pageSlideInDown 300ms ease-out;
+}
+
+.page-transition-scale {
+	animation: pageScale 300ms ease-out;
+}
+
+/* 页面过渡关键帧 */
+@keyframes pageFadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes pageSlideInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(-30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes pageSlideInUp {
+	from {
+		opacity: 0;
+		transform: translateY(-30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes pageSlideInDown {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes pageScale {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+/* 页面过渡的性能优化 */
+.page-transition-fade,
+.page-transition-slide-left,
+.page-transition-slide-up,
+.page-transition-slide-down,
+.page-transition-scale {
+	transform: translateZ(0); /* 启用硬件加速 */
+	will-change: opacity, transform; /* 提示浏览器优化 */
+}
+
+/* ========================================
+   图标悬停动画
+   ========================================
+   图标和按钮的交互动画。
+   包含已使用和可能用到的动画。
+   ======================================== */
+
+/* 旋转动画 - 用于刷新和设置图标 */
+@keyframes spin-hover {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(180deg);
+	}
+}
+
+/* 摆动动画 - 用于折叠按钮 */
+@keyframes wiggle {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-2px);
+	}
+	75% {
+		transform: translateX(2px);
+	}
+}
+
+/* 缩放脉冲动画 - 用于吸引注意力的效果 */
+@keyframes scale-pulse {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.15);
+	}
+}
+
+/* 缩放弹跳动画 - 用于有趣的交互 */
+@keyframes scale-bounce {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.25);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+/* 心跳动画 - 用于状态指示器或 CTA 按钮 */
+@keyframes heartbeat {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	14% {
+		transform: scale(1.2);
+	}
+	28% {
+		transform: scale(1);
+	}
+	42% {
+		transform: scale(1.2);
+	}
+	70% {
+		transform: scale(1);
+	}
+}
+
+/* 上下跳动动画 - 用于通知按钮 */
+@keyframes bounce-y {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-3px);
+	}
+}
+
+/* 摆动动画 - 用于钟摆式左右摆动 */
+@keyframes swing {
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+	20% {
+		transform: rotate(15deg);
+	}
+	40% {
+		transform: rotate(-10deg);
+	}
+	60% {
+		transform: rotate(5deg);
+	}
+	80% {
+		transform: rotate(-5deg);
+	}
+}
+
+/* 轻快跳跃动画 - 用于轻盈的跳跃效果 */
+@keyframes hop {
+	0% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-8px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+/* 摇晃动画 - 用于左右剧烈摇晃 */
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	10%,
+	30%,
+	50%,
+	70%,
+	90% {
+		transform: translateX(-2px);
+	}
+	20%,
+	40%,
+	60%,
+	80% {
+		transform: translateX(2px);
+	}
+}
+
+/* 橡皮筋动画 - 用于拉伸回弹效果 */
+@keyframes rubber-band {
+	0%,
+	100% {
+		transform: scaleX(1) scaleY(1);
+	}
+	30% {
+		transform: scaleX(1.25) scaleY(0.75);
+	}
+	40% {
+		transform: scaleX(0.75) scaleY(1.25);
+	}
+	50% {
+		transform: scaleX(1.15) scaleY(0.85);
+	}
+	65% {
+		transform: scaleX(0.95) scaleY(1.05);
+	}
+	75% {
+		transform: scaleX(1.05) scaleY(0.95);
+	}
+}
+
+/* 庆祝动画 - 用于庆祝效果 */
+@keyframes tada {
+	0%,
+	100% {
+		transform: scale(1) rotate(0deg);
+	}
+	10%,
+	20% {
+		transform: scale(0.9) rotate(-3deg);
+	}
+	30%,
+	50%,
+	70%,
+	90% {
+		transform: scale(1.1) rotate(3deg);
+	}
+	40%,
+	60%,
+	80% {
+		transform: scale(1.1) rotate(-3deg);
+	}
+}
+
+/* 按钮悬停时的图标动画 */
+.ant-btn:hover .icon-spin-hover {
+	animation: spin-hover 0.6s ease-in-out;
+}
+
+.ant-btn:hover .icon-wiggle {
+	animation: wiggle 0.5s ease-in-out;
+}
+
+.ant-btn:hover .icon-scale-pulse {
+	animation: scale-pulse 0.6s ease-in-out;
+}
+
+.ant-btn:hover .icon-scale-bounce {
+	animation: scale-bounce 0.4s ease-out;
+}
+
+.ant-btn:hover .icon-heartbeat {
+	animation: heartbeat 0.8s ease-in-out;
+}
+
+.ant-btn:hover .icon-tada {
+	animation: tada 0.8s ease-in-out;
+}
+
+.ant-btn:hover .icon-swing {
+	animation: swing 0.6s ease-in-out;
+}
+
+.ant-btn:hover .icon-bounce-y {
+	animation: bounce-y 0.5s ease-in-out;
+}
+
+.ant-btn:hover .icon-hop {
+	animation: hop 0.3s ease-out;
+}
+
+.ant-btn:hover .icon-shake {
+	animation: shake 0.4s ease-in-out;
+}
+
+.ant-btn:hover .icon-rubber-band {
+	animation: rubber-band 0.6s ease-in-out;
+}
+
+/* 悬停触发的动画类 */
+.hover\:animate-spin-hover:hover {
+	animation: spin-hover 0.6s ease-in-out;
+}
+
+.hover\:animate-wiggle:hover {
+	animation: wiggle 0.5s ease-in-out;
+}
+
+.hover\:animate-wiggle-fast:hover {
+	animation: wiggle 0.3s ease-in-out;
+}
+
+.hover\:animate-scale-pulse:hover {
+	animation: scale-pulse 0.6s ease-in-out;
+}
+
+.hover\:animate-scale-bounce:hover {
+	animation: scale-bounce 0.4s ease-out;
+}
+
+.hover\:animate-heartbeat:hover {
+	animation: heartbeat 0.8s ease-in-out;
+}
+
+.hover\:animate-tada:hover {
+	animation: tada 0.8s ease-in-out;
+}
+
+.hover\:animate-swing:hover {
+	animation: swing 0.6s ease-in-out;
+}
+
+.hover\:animate-bounce-y:hover {
+	animation: bounce-y 0.5s ease-in-out;
+}
+
+.hover\:animate-hop:hover {
+	animation: hop 0.3s ease-out;
+}
+
+.hover\:animate-shake:hover {
+	animation: shake 0.4s ease-in-out;
+}
+
+.hover\:animate-rubber-band:hover {
+	animation: rubber-band 0.6s ease-in-out;
+}
+
+/* 群组悬停动画 */
+.group:hover .group-hover\:animate-spin-hover {
+	animation: spin-hover 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-wiggle {
+	animation: wiggle 0.5s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-wiggle-fast {
+	animation: wiggle 0.3s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-scale-pulse {
+	animation: scale-pulse 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-scale-bounce {
+	animation: scale-bounce 0.4s ease-out;
+}
+
+.group:hover .group-hover\:animate-heartbeat {
+	animation: heartbeat 0.8s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-tada {
+	animation: tada 0.8s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-swing {
+	animation: swing 0.6s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-bounce-y {
+	animation: bounce-y 0.5s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-hop {
+	animation: hop 0.3s ease-out;
+}
+
+.group:hover .group-hover\:animate-shake {
+	animation: shake 0.4s ease-in-out;
+}
+
+.group:hover .group-hover\:animate-rubber-band {
+	animation: rubber-band 0.6s ease-in-out;
+}
+
+/* 直接使用的动画类 */
+.animate-spin-hover {
+	animation: spin-hover 0.6s ease-in-out;
+}
+
+.animate-wiggle {
+	animation: wiggle 0.5s ease-in-out;
+}
+
+.animate-wiggle-fast {
+	animation: wiggle 0.3s ease-in-out;
+}
+
+.animate-scale-pulse {
+	animation: scale-pulse 0.6s ease-in-out;
+}
+
+.animate-scale-bounce {
+	animation: scale-bounce 0.4s ease-out;
+}
+
+.animate-heartbeat {
+	animation: heartbeat 0.8s ease-in-out;
+}
+
+.animate-tada {
+	animation: tada 0.8s ease-in-out;
+}
+
+.animate-swing {
+	animation: swing 0.6s ease-in-out;
+}
+
+.animate-bounce-y {
+	animation: bounce-y 0.5s ease-in-out;
+}
+
+.animate-hop {
+	animation: hop 0.3s ease-out;
+}
+
+.animate-shake {
+	animation: shake 0.4s ease-in-out;
+}
+
+.animate-rubber-band {
+	animation: rubber-band 0.6s ease-in-out;
+}
