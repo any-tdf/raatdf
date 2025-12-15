@@ -1,6 +1,6 @@
 import { Spin } from 'antd';
 import React, { Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import type { MenuItem } from '@/api/mocks/menu';
 import { userApi } from '@/api/modules/user';
 import { system } from '@/components';
@@ -176,12 +176,12 @@ function App() {
 	}, [setUserInfo, setMenuData, setMenuStoreData]);
 
 	return (
-		<BrowserRouter>
+		<HashRouter>
 			<system.ThemeProvider>
 				<system.TabContextMenu />
 				<AppRoutes isAuthenticated={isAuthenticated} checkingAuth={checkingAuth} />
 			</system.ThemeProvider>
-		</BrowserRouter>
+		</HashRouter>
 	);
 }
 
