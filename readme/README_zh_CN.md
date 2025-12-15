@@ -47,7 +47,7 @@ RAATDF 是一个高效、优雅、轻量级的企业级后台管理模板，采�
 
 # 快速链接
 
-📺 [在线演示](https://preview.raatdf.com) | 📖 [使用文档](https://raatdf.com) | 🐙 [GitHub 仓库](https://github.com/any-tdf/raatdf)
+📺 [在线演示](https://raatdf.com) | 📖 [使用文档](https://doc.raatdf.com) | 🐙 [GitHub 仓库](https://github.com/any-tdf/raatdf)
 
 # 核心技术栈
 
@@ -172,9 +172,7 @@ bun run format:fix   # 自动格式化代码
 - `docs`: 文档更新
 - `style`: 代码格式变更
 - `refactor`: 代码重构
-- `perf`: 性能优化
-- `test`: 测试相关
-- `chore`: 构建/工具相关
+- `chore`: 构建工具或辅助工具的变动
 
 # 反馈与交流
 
@@ -185,7 +183,7 @@ bun run format:fix   # 自动格式化代码
 
 ## 社区
 
-- 🌐 [Discord](https://discord.gg/DMkHu8GGre)
+社区链接即将推出。
 
 # 贡献者
 

@@ -47,7 +47,7 @@ RAATDF is an efficient, elegant, and lightweight enterprise-grade admin template
 
 # Quick Links
 
-📺 [Live Demo](https://preview.raatdf.com) | 📖 [Documentation](https://raatdf.com) | 🐙 [GitHub Repository](https://github.com/any-tdf/raatdf)
+📺 [Live Demo](https://raatdf.com) | 📖 [Documentation](https://doc.raatdf.com) | 🐙 [GitHub Repository](https://github.com/any-tdf/raatdf)
 
 # Core Technology Stack
 
@@ -172,8 +172,6 @@ Please follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `docs`: Documentation update
 - `style`: Code style changes
 - `refactor`: Code refactoring
-- `perf`: Performance improvement
-- `test`: Testing related
 - `chore`: Build/tool related
 
 # Feedback & Communication
@@ -185,7 +183,7 @@ Please follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Community
 
-- 🌐 [Discord](https://discord.gg/DMkHu8GGre)
+Community links coming soon.
 
 # Contributors
 
