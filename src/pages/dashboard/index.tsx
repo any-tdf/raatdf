@@ -293,7 +293,7 @@ function Dashboard() {
 									}
 									value={18.5}
 									precision={1}
-									valueStyle={{ color: 'var(--ant-color-success)', fontSize: 24 }}
+									styles={{ content: { color: 'var(--ant-color-success)', fontSize: 24 } }}
 									prefix={<i className="ri-arrow-up-line" />}
 									suffix="%"
 								/>
@@ -316,7 +316,7 @@ function Dashboard() {
 									}
 									value={22.3}
 									precision={1}
-									valueStyle={{ color: 'var(--ant-color-success)', fontSize: 24 }}
+									styles={{ content: { color: 'var(--ant-color-success)', fontSize: 24 } }}
 									prefix={<i className="ri-arrow-up-line" />}
 									suffix="%"
 								/>
@@ -339,7 +339,7 @@ function Dashboard() {
 									}
 									value={94.7}
 									precision={1}
-									valueStyle={{ color: 'var(--ant-color-primary)', fontSize: 24 }}
+									styles={{ content: { color: 'var(--ant-color-primary)', fontSize: 24 } }}
 									suffix="%"
 								/>
 							</ProCard>
@@ -361,7 +361,7 @@ function Dashboard() {
 									}
 									value={89.2}
 									precision={1}
-									valueStyle={{ color: 'var(--ant-color-warning)', fontSize: 24 }}
+									styles={{ content: { color: 'var(--ant-color-warning)', fontSize: 24 } }}
 									suffix="%"
 								/>
 							</ProCard>
