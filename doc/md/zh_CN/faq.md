@@ -1,10 +1,6 @@
-# 常见问题
+# 推荐的包管理器？
 
-## 环境配置
-
-### Q: 使用什么包管理器？
-
-使用 **Bun**，比 npm/yarn 更快。
+推荐使用 **Bun**，比 npm/yarn 更快。
 
 ```bash
 # 安装 Bun
@@ -14,25 +10,11 @@ curl -fsSL https://bun.sh/install | bash
 bun install
 ```
 
-### Q: Node.js 版本要求？
+# Node.js 版本要求？
 
 最低 Node.js 18.0，推荐 20+。
 
----
-
-## 开发问题
-
-### Q: 如何修改默认端口？
-
-修改 `vite.config.ts`：
-
-```ts
-server: {
-  port: 3000,
-}
-```
-
-### Q: 导入路径别名是什么？
+# 路径别名？
 
 使用 `@/` 指向 `src/` 目录：
 
@@ -40,25 +22,7 @@ server: {
 import { useSystemStore } from '@/store';
 ```
 
-### Q: 如何添加环境变量？
-
-创建 `.env` 文件：
-
-```bash
-VITE_API_BASE_URL=http://localhost:3000
-```
-
-代码中使用：
-
-```ts
-const apiUrl = import.meta.env.VITE_API_BASE_URL;
-```
-
----
-
-## 样式问题
-
-### Q: 如何支持主题切换？
+# 主题切换？
 
 使用 CSS 变量：
 
@@ -70,7 +34,7 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL;
 <div className="text-blue-500">
 ```
 
-### Q: 如何使用图标？
+# 使用图标？
 
 使用 RemixIcon：
 
@@ -81,23 +45,15 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 图标查询：[remixicon.com](https://remixicon.com/)
 
-### Q: Space 组件报 direction 废弃警告？
+# Tailwind 使用 Ant Design 变量？
 
-使用 `vertical` 属性：
+Tailwind CSS v4 支持直接使用 CSS 变量：
 
 ```tsx
-// 正确
-<Space vertical size="large">
-
-// 废弃
-<Space direction="vertical" size="large">
+<div className="text-(--ant-color-primary) bg-(--ant-color-bg-container)">
 ```
 
----
-
-## 国际化
-
-### Q: 如何获取当前语言的文案？
+# 获取语言文案？
 
 ```tsx
 import { useSystemStore } from '@/store';
@@ -107,41 +63,50 @@ const { locale } = useSystemStore();
 const t = getDashboardLocale(locale);
 ```
 
-### Q: 如何添加新语言？
+# 添加新语言？
 
 1. 在 `src/types/locale.ts` 添加类型
 2. 在各 locale 文件添加翻译
 3. 在语言切换组件添加选项
 
----
+# 修改系统名称？
 
-## 权限问题
+修改 `src/locales/system/` 目录下对应语言文件中的 `system.name`。
 
-### Q: 如何控制菜单权限？
+# 隐藏设置项？
 
-在菜单配置中设置 `roles`：
+在 `src/config/system.ts` 中修改 `FEATURE_FLAGS`：
 
 ```ts
-{
-  key: 'admin',
-  path: '/admin',
-  roles: ['admin'],
-}
+export const FEATURE_FLAGS = {
+  tabs: false,      // 隐藏多标签页设置
+  compactMode: false, // 隐藏紧凑模式设置
+  // ...
+};
 ```
 
-### Q: 如何保护路由？
+# 修改默认布局？
 
-```tsx
-<Route element={<ProtectedRoute requiredRole="admin" />}>
-  <Route path="/admin" element={<AdminPage />} />
-</Route>
+在 `src/config/system.ts` 中修改 `SYSTEM_DEFAULTS`：
+
+```ts
+export const SYSTEM_DEFAULTS = {
+  layout: {
+    menuLayout: 'horizontal', // 改为顶栏布局
+    // ...
+  },
+};
 ```
 
----
+# 自定义账号菜单？
 
-## 构建问题
+修改 `src/layouts/account-menu-items.tsx` 配置账号下拉菜单项。
 
-### Q: 构建失败怎么办？
+# 添加顶栏按钮？
+
+修改 `src/layouts/toolbar-buttons.tsx` 配置顶栏功能按钮。
+
+# 构建失败？
 
 ```bash
 # 清除缓存重新构建
@@ -150,36 +115,9 @@ bun install
 bun build
 ```
 
-### Q: 代码检查报错？
+# 代码检查报错？
 
 ```bash
 # 自动修复
 bun check:fix
 ```
-
----
-
-## 其他
-
-### Q: 如何配置代理？
-
-修改 `vite.config.ts`：
-
-```ts
-server: {
-  proxy: {
-    '/api': {
-      target: 'http://api.example.com',
-      changeOrigin: true,
-    },
-  },
-}
-```
-
-### Q: 如何修改系统名称？
-
-修改 `src/locales/system/common.ts` 中的 `system.name`。
-
----
-
-**最后更新:** 2024-12-09

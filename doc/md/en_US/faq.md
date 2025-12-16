@@ -1,10 +1,6 @@
-# FAQ
+# Package manager?
 
-## Environment Setup
-
-### Q: Which package manager should I use?
-
-Use **Bun**, it's faster than npm/yarn.
+**Bun** is recommended, it's faster than npm/yarn.
 
 ```bash
 # Install Bun
@@ -14,25 +10,11 @@ curl -fsSL https://bun.sh/install | bash
 bun install
 ```
 
-### Q: What Node.js version is required?
+# Node.js version?
 
 Minimum Node.js 18.0, recommended 20+.
 
----
-
-## Development Issues
-
-### Q: How to change the default port?
-
-Modify `vite.config.ts`:
-
-```ts
-server: {
-  port: 3000,
-}
-```
-
-### Q: What is the import path alias?
+# Path alias?
 
 Use `@/` to point to `src/` directory:
 
@@ -40,25 +22,7 @@ Use `@/` to point to `src/` directory:
 import { useSystemStore } from '@/store';
 ```
 
-### Q: How to add environment variables?
-
-Create `.env` file:
-
-```bash
-VITE_API_BASE_URL=http://localhost:3000
-```
-
-Use in code:
-
-```ts
-const apiUrl = import.meta.env.VITE_API_BASE_URL;
-```
-
----
-
-## Styling Issues
-
-### Q: How to support theme switching?
+# Theme switching?
 
 Use CSS variables:
 
@@ -70,7 +34,7 @@ Use CSS variables:
 <div className="text-blue-500">
 ```
 
-### Q: How to use icons?
+# Using icons?
 
 Use RemixIcon:
 
@@ -81,23 +45,15 @@ Use RemixIcon:
 
 Icon lookup: [remixicon.com](https://remixicon.com/)
 
-### Q: Space component shows direction deprecation warning?
+# Ant Design variables in Tailwind?
 
-Use `vertical` attribute:
+Tailwind CSS v4 supports CSS variables directly:
 
 ```tsx
-// Correct
-<Space vertical size="large">
-
-// Deprecated
-<Space direction="vertical" size="large">
+<div className="text-(--ant-color-primary) bg-(--ant-color-bg-container)">
 ```
 
----
-
-## Internationalization
-
-### Q: How to get text for current language?
+# Get locale text?
 
 ```tsx
 import { useSystemStore } from '@/store';
@@ -107,41 +63,50 @@ const { locale } = useSystemStore();
 const t = getDashboardLocale(locale);
 ```
 
-### Q: How to add a new language?
+# Add new language?
 
 1. Add type in `src/types/locale.ts`
 2. Add translations in each locale file
 3. Add option in language switch component
 
----
+# Change system name?
 
-## Permission Issues
+Modify `system.name` in `src/locales/system/` for the corresponding language file.
 
-### Q: How to control menu permissions?
+# Hide settings?
 
-Set `roles` in menu configuration:
+Modify `FEATURE_FLAGS` in `src/config/system.ts`:
 
 ```ts
-{
-  key: 'admin',
-  path: '/admin',
-  roles: ['admin'],
-}
+export const FEATURE_FLAGS = {
+  tabs: false,      // Hide tabs setting
+  compactMode: false, // Hide compact mode setting
+  // ...
+};
 ```
 
-### Q: How to protect routes?
+# Change default layout?
 
-```tsx
-<Route element={<ProtectedRoute requiredRole="admin" />}>
-  <Route path="/admin" element={<AdminPage />} />
-</Route>
+Modify `SYSTEM_DEFAULTS` in `src/config/system.ts`:
+
+```ts
+export const SYSTEM_DEFAULTS = {
+  layout: {
+    menuLayout: 'horizontal', // Change to top bar layout
+    // ...
+  },
+};
 ```
 
----
+# Customize account menu?
 
-## Build Issues
+Modify `src/layouts/account-menu-items.tsx` to configure account dropdown items.
 
-### Q: What to do if build fails?
+# Add header buttons?
+
+Modify `src/layouts/toolbar-buttons.tsx` to configure header function buttons.
+
+# Build fails?
 
 ```bash
 # Clear cache and rebuild
@@ -150,32 +115,9 @@ bun install
 bun build
 ```
 
-### Q: Code check errors?
+# Code check errors?
 
 ```bash
 # Auto-fix
 bun check:fix
 ```
-
----
-
-## Others
-
-### Q: How to configure proxy?
-
-Modify `vite.config.ts`:
-
-```ts
-server: {
-  proxy: {
-    '/api': {
-      target: 'http://api.example.com',
-      changeOrigin: true,
-    },
-  },
-}
-```
-
-### Q: How to change system name?
-
-Modify `system.name` in `src/locales/system/` for each language.
