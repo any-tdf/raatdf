@@ -157,6 +157,20 @@ html.dark {
 }
 
 /* ========================================
+   菜单样式覆盖
+   ========================================
+   移除 Ant Design 菜单的默认边框。
+   ======================================== */
+
+/* 移除菜单右侧边框 */
+.ant-menu-light.ant-menu-root.ant-menu-inline,
+.ant-menu-light > .ant-menu.ant-menu-root.ant-menu-inline,
+.ant-menu-light.ant-menu-root.ant-menu-vertical,
+.ant-menu-light > .ant-menu.ant-menu-root.ant-menu-vertical {
+	border-inline-end: none;
+}
+
+/* ========================================
    按钮图标样式
    ========================================
    修复按钮中图标的对齐问题。
