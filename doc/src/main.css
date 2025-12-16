@@ -3,63 +3,101 @@
 
 /* Markdown 链接样式 - 黑白灰配色 */
 .prose a {
-  color: #1f2937 !important;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+	color: #1f2937 !important;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	text-decoration-thickness: 1px;
 }
 
 .prose a:hover {
-  color: #111827 !important;
-  text-decoration-thickness: 2px;
+	color: #111827 !important;
+	text-decoration-thickness: 2px;
 }
 
 /* 暗色模式链接颜色 */
 @media (prefers-color-scheme: dark) {
-  .prose a {
-    color: #e5e7eb !important;
-  }
+	.prose a {
+		color: #e5e7eb !important;
+	}
 
-  .prose a:hover {
-    color: #f3f4f6 !important;
-  }
+	.prose a:hover {
+		color: #f3f4f6 !important;
+	}
+}
+
+/* README 居中区域样式 */
+.prose div[align="center"] {
+	text-align: center;
+	margin: 2rem 0;
+}
+
+.prose div[align="center"] img {
+	display: inline-block;
+	margin: 1rem auto;
+}
+
+.prose div[align="center"] h1 {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.prose div[align="center"] p {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 1rem 0;
+}
+
+.prose div[align="center"] p img {
+	display: inline-block;
+	margin: 0.25rem;
+}
+
+/* Badge 图片样式 */
+.prose img[src*="shields.io"],
+.prose img[src*="badge"] {
+	display: inline-block !important;
+	margin: 0.25rem !important;
+	vertical-align: middle;
 }
 
 /* 弱化滚动条样式 */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
 }
 
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+	width: 6px;
+	height: 6px;
 }
 
 *::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.4);
-  border-radius: 3px;
+	background-color: rgba(156, 163, 175, 0.4);
+	border-radius: 3px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.6);
+	background-color: rgba(156, 163, 175, 0.6);
 }
 
 /* 暗色模式滚动条 */
 @media (prefers-color-scheme: dark) {
-  * {
-    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  }
+	* {
+		scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+	}
 
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(75, 85, 99, 0.5);
-  }
+	*::-webkit-scrollbar-thumb {
+		background-color: rgba(75, 85, 99, 0.5);
+	}
 
-  *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(75, 85, 99, 0.7);
-  }
+	*::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(75, 85, 99, 0.7);
+	}
 }
