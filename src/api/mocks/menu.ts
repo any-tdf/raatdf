@@ -44,6 +44,15 @@ const menuDataZhCN: MenuItem[] = [
 		roles: ['admin', 'user'],
 	},
 	{
+		key: 'docs',
+		label: '项目文档',
+		icon: 'ri-book-read-line',
+		path: '/docs',
+		children: [],
+		component: 'Docs',
+		roles: ['admin', 'user'],
+	},
+	{
 		key: 'examples',
 		label: '示例页面',
 		icon: 'ri-file-list-3-line',
@@ -118,6 +127,15 @@ const menuDataEnUS: MenuItem[] = [
 		path: '/profile',
 		children: [],
 		component: 'Profile',
+		roles: ['admin', 'user'],
+	},
+	{
+		key: 'docs',
+		label: 'Documentation',
+		icon: 'ri-book-read-line',
+		path: '/docs',
+		children: [],
+		component: 'Docs',
 		roles: ['admin', 'user'],
 	},
 	{
