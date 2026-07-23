@@ -1,28 +1,64 @@
 import path from 'node:path';
+
+import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import { defineConfig } from 'vite-plus';
 
 // https://vite.dev/config/
 export default defineConfig({
+	fmt: {
+		arrowParens: 'always',
+		bracketSameLine: false,
+		bracketSpacing: true,
+		endOfLine: 'lf',
+		ignorePatterns: [
+			'doc/**',
+			'dist/**',
+			'node_modules/**',
+			'public/**',
+			'coverage/**',
+			'.cache/**',
+			'.next/**',
+			'.nuxt/**',
+			'.output/**',
+			'.turbo/**',
+			'.vite/**',
+		],
+		printWidth: 120,
+		quoteProps: 'as-needed',
+		semi: true,
+		singleQuote: true,
+		sortImports: true,
+		sortPackageJson: false,
+		sortTailwindcss: {
+			stylesheet: './src/app.css',
+		},
+		tabWidth: 2,
+		trailingComma: 'es5',
+		useTabs: true,
+	},
+	lint: {
+		ignorePatterns: ['doc/**', 'dist/**', 'node_modules/**', 'public/**', 'coverage/**'],
+		jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+		rules: { 'vite-plus/prefer-vite-plus-imports': 'error' },
+		options: { typeAware: true, typeCheck: true },
+	},
+	test: {
+		restoreMocks: true,
+		setupFiles: ['./src/test/setup.ts'],
+	},
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
-	plugins: [
-		tailwindcss(),
-		react({
-			babel: {
-				plugins: [['babel-plugin-react-compiler']],
-			},
-		}),
-	],
+	plugins: [tailwindcss(), react(), babel({ presets: [reactCompilerPreset()] })],
 	build: {
 		rollupOptions: {
 			output: {
-				// Vite 8 + Rolldown 使用 advancedChunks 替代 manualChunks
-				advancedChunks: {
+				// Vite Plus 使用 Rolldown 的 codeSplitting 配置手动分包
+				codeSplitting: {
 					groups: [
 						// React 核心库 - 版本稳定，长期缓存
 						{

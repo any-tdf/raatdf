@@ -17,7 +17,7 @@ permissions:
 
 # 并发设置：避免多个部署同时运行
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
@@ -30,18 +30,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 设置 Bun 运行时
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      # 设置 Vite Plus 与 Node.js 运行时
+      - name: Setup Vite Plus
+        uses: voidzero-dev/setup-vp@v1
         with:
-          bun-version: latest
+          node-version: '24'
+          cache: true
 
       # 安装项目依赖
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install documentation dependencies
+        working-directory: doc
+        run: bun install --frozen-lockfile
+
+      # 检查格式、lint 与类型
+      - name: Check project
+        run: bun run check
+
+      - name: Test project
+        run: bun run test
+
+      - name: Audit project dependencies
+        run: bun audit
+
+      - name: Check documentation
+        working-directory: doc
+        run: bun run check
+
+      - name: Audit documentation dependencies
+        working-directory: doc
+        run: bun audit
+
       # 构建项目
       - name: Build project
+        run: bun run build
+
+      - name: Build documentation
+        working-directory: doc
         run: bun run build
 
       # 上传构建产物
