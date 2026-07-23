@@ -1,20 +1,35 @@
 {
 	"name": "doc",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.2.0",
+	"description": "RAATDF documentation site powered by Astro Starlight",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"preview": "vite preview"
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"sync": "astro sync",
+		"lint": "vp lint",
+		"lint:fix": "vp lint --fix",
+		"format": "vp fmt --check",
+		"format:fix": "vp fmt",
+		"check": "astro check && vp check",
+		"check:fix": "vp check --fix && astro check"
 	},
 	"dependencies": {
-		"highlight.js": "^11.11.1",
-		"marked": "^17.0.1"
+		"@astrojs/starlight": "^0.41.4",
+		"astro": "^7.1.3"
 	},
 	"devDependencies": {
-		"@tailwindcss/typography": "^0.5.19",
-		"@tailwindcss/vite": "^4.1.17",
-		"vite": "^7.2.4"
+		"@astrojs/check": "^0.9.9",
+		"typescript": "~6.0.3",
+		"vite-plus": "0.2.6"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "bun",
+			"version": "1.3.14",
+			"onFail": "download"
+		}
 	}
 }

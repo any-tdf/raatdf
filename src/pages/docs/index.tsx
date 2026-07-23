@@ -1,65 +1,77 @@
-import { Spin } from 'antd';
-import { useState, useEffect, useRef } from 'react';
+import { Button, Result, Spin } from 'antd';
+import { useEffect, useState } from 'react';
 
-export default function Docs() {
-	const [loading, setLoading] = useState(true);
-	const containerRef = useRef<HTMLDivElement>(null);
+import { getDocsUrl } from '@/config/docs';
+import { getCommonLocale } from '@/locales';
+import { useSystemStore } from '@/store';
+
+const DOCS_LOAD_TIMEOUT = 10_000;
+
+type LoadStatus = 'loading' | 'ready' | 'error';
+
+interface DocsProps {
+	docsUrl?: string;
+}
+
+const Docs = ({ docsUrl = getDocsUrl() }: DocsProps) => {
+	const locale = useSystemStore((state) => state.locale);
+	const t = getCommonLocale(locale).docs;
+	const [status, setStatus] = useState<LoadStatus>('loading');
+	const [reloadKey, setReloadKey] = useState(0);
 
 	useEffect(() => {
-		const updateHeight = () => {
-			if (!containerRef.current) return;
+		if (status !== 'loading') return;
+		const timer = window.setTimeout(() => setStatus('error'), DOCS_LOAD_TIMEOUT);
+		return () => window.clearTimeout(timer);
+	}, [reloadKey, status]);
 
-			// 向上查找记载 Content 的实际可用高度
-			let current: HTMLElement | null = containerRef.current.parentElement;
-			while (current && !current.classList.contains('ant-layout-content')) {
-				current = current.parentElement;
-			}
-
-			if (current) {
-				// Content 可用高度 = 元素高度 - 内边距
-				const style = window.getComputedStyle(current);
-				const paddingY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-				const availableHeight = current.clientHeight - paddingY;
-
-				containerRef.current.style.height = `${availableHeight}px`;
-			}
-		};
-
-		// 多次执行以适应各种布局变化
-		const timers = [10, 50, 150].map(ms => setTimeout(updateHeight, ms));
-		window.addEventListener('resize', updateHeight);
-
-		return () => {
-			window.removeEventListener('resize', updateHeight);
-			timers.forEach((t) => {
-				clearTimeout(t);
-			});
-		};
-	}, []);
+	const retry = () => {
+		setStatus('loading');
+		setReloadKey((current) => current + 1);
+	};
 
 	return (
-		<div ref={containerRef} style={{ width: '100%', overflow: 'hidden', position: 'relative' }}>
-			{loading && (
-				<div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
-					<Spin size="large" />
+		<div className="docs-page relative flex h-full min-h-0 w-full flex-col overflow-hidden">
+			<div className="absolute top-3 right-3 z-10">
+				<Button href={docsUrl} target="_blank" rel="noreferrer" icon={<i className="ri-external-link-line" />}>
+					{t.openExternal}
+				</Button>
+			</div>
+
+			{status === 'loading' && (
+				<div className="absolute inset-0 z-5 flex items-center justify-center">
+					<Spin size="large" description={t.loading} />
 				</div>
 			)}
+
+			{status === 'error' && (
+				<div className="absolute inset-0 z-5 flex items-center justify-center">
+					<Result
+						status="warning"
+						title={t.timeoutTitle}
+						subTitle={t.timeoutDescription}
+						extra={[
+							<Button key="retry" type="primary" onClick={retry}>
+								{t.retry}
+							</Button>,
+							<Button key="external" href={docsUrl} target="_blank" rel="noreferrer">
+								{t.openExternal}
+							</Button>,
+						]}
+					/>
+				</div>
+			)}
+
 			<iframe
-				src="https://doc.raatdf.com"
-				title="文档"
-				style={{
-					width: '100%',
-					height: '100%',
-					border: 'none',
-					opacity: loading ? 0 : 1,
-				}}
-				onLoad={() => setLoading(false)}
+				key={reloadKey}
+				src={docsUrl}
+				title={t.iframeTitle}
+				className="min-h-0 w-full flex-1 border-0"
+				style={{ opacity: status === 'ready' ? 1 : 0 }}
+				onLoad={() => setStatus('ready')}
 			/>
 		</div>
 	);
-}
+};
 
-
-
-
-
+export default Docs;

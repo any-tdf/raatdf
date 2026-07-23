@@ -1,0 +1,25 @@
+:root {
+	--sl-color-accent-low: hsl(214, 55%, 20%);
+	--sl-color-accent: hsl(210, 100%, 60%);
+	--sl-color-accent-high: hsl(207, 100%, 86%);
+	--sl-content-width: 52rem;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-high: hsl(215, 85%, 30%);
+	--sl-color-accent: hsl(209, 100%, 50%);
+	--sl-color-accent-low: hsl(206, 100%, 94%);
+}
+
+.site-title img {
+	border-radius: 0.4rem;
+}
+
+.hero .tagline {
+	max-width: 42rem;
+}
+
+.sl-markdown-content table {
+	display: table;
+	width: 100%;
+}
