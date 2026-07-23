@@ -1,7 +1,7 @@
 <div align="center">
 
 [![部署到 GitHub Pages](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml/badge.svg)](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml)
-[![Deploy to Cloudflare Pages](  https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
+[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
 
   <img src="https://raatdf.com/logo.png" alt="logo" width="120" height="auto" />
 
@@ -10,11 +10,12 @@
 ![](https://img.shields.io/badge/-React%2019-%2361dafb?logo=react&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Ant%20Design%206-%231890ff?logo=antdesign&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Tailwind%20CSS%204-%2306b6d4?logo=tailwindcss&logoColor=ffffff)
-![](https://img.shields.io/badge/-TypeScript%205-%233178c6?logo=typescript&logoColor=ffffff)
+![](https://img.shields.io/badge/-TypeScript%207-%233178c6?logo=typescript&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Vite%208-%23646cff?logo=vite&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Zustand%205-%23443e38)
 ![](https://img.shields.io/badge/-React%20Router%207-%23ca4245?logo=reactrouter&logoColor=ffffff)
-![](https://img.shields.io/badge/-Biome%202-%2360a5fa?logo=biome&logoColor=ffffff)
+![](https://img.shields.io/badge/-Vite%2B%200.2-%23646cff?logo=vite&logoColor=ffffff)
+![](https://img.shields.io/badge/-Astro%207-%23bc52ee?logo=astro&logoColor=ffffff)
 
 [![GitHub stars](https://img.shields.io/github/stars/any-tdf/raatdf?logo=github&label=star&style=for-the-badge&color=A1DAD7&logoColor=D9F8F2&labelColor=011918)](https://github.com/any-tdf/raatdf)
 [![GitHub license](https://img.shields.io/github/license/any-tdf/raatdf?logo=github&style=for-the-badge&color=B9C46A&logoColor=F3F3CB&labelColor=161901)](https://github.com/any-tdf/raatdf)
@@ -52,14 +53,15 @@ RAATDF 是一个高效、优雅、轻量级的企业级后台管理模板，采�
 
 # 核心技术栈
 
-- **构建工具**: [Vite](https://vitejs.dev) v8 (Beta) - 极速开发体验
+- **构建工具**: [Vite+](https://viteplus.dev) v0.2 (Vite 8) - 极速开发体验
 - **前端框架**: [React](https://react.dev) v19 - 最新版本，支持 React Compiler
-- **类型系统**: [TypeScript](https://www.typescriptlang.org) v5 - 严格类型检查
+- **类型系统**: [TypeScript](https://www.typescriptlang.org) v7 - 严格类型检查
 - **UI 框架**: [Ant Design](https://ant.design) v6 - 企业级 UI 组件库
 - **样式方案**: [Tailwind CSS](https://tailwindcss.com) v4 - 原子化 CSS 框架
 - **状态管理**: [Zustand](https://zustand-demo.pmnd.rs) v5 - 轻量级状态管理
 - **路由方案**: [React Router](https://reactrouter.com) v7 - 最新路由解决方案
-- **代码质量**: [Biome](https://biomejs.dev) - 统一的代码检查和格式化工具
+- **代码质量**: [Vite+](https://viteplus.dev) - 统一的代码检查和格式化工具
+- **文档站**：[Astro](https://astro.build) v7 + [Starlight](https://starlight.astro.build) v0.41
 
 # 功能特性
 
@@ -104,8 +106,9 @@ RAATDF 是一个高效、优雅、轻量级的企业级后台管理模板，采�
 
 ## 环境要求
 
-- Node.js >= 18.0.0
-- Bun >= 1.0.0（推荐）或 npm/yarn/pnpm
+- Node.js ^22.18.0 或 >= 24.11.0
+- Bun >= 1.3.14
+- Vite Plus 0.2.6
 
 ## 安装使用
 
@@ -120,7 +123,7 @@ cd raatdf
 bun install
 
 # 启动开发服务器
-bun dev
+bun run dev
 
 # 构建生产版本
 bun run build
@@ -133,22 +136,34 @@ bun run preview
 
 ```bash
 # 代码检查和格式化
-bun run check        # 运行 Biome 检查
-bun run check:fix    # 自动修复代码问题
-bun run lint         # 仅检查代码规范
-bun run lint:fix     # 自动修复代码规范问题
-bun run format       # 检查代码格式
-bun run format:fix   # 自动格式化代码
+bun run check  # 运行 Vite+ 检查
+bun run check:fix  # 自动修复代码问题
+bun run lint  # 仅检查代码规范
+bun run lint:fix  # 自动修复代码规范问题
+bun run format  # 检查代码格式
+bun run format:fix  # 自动格式化代码
 ```
+
+## 文档站命令
+
+```bash
+cd doc
+bun install
+bun run dev  # 启动 Astro Starlight 文档站
+bun run check  # 执行 Astro 类型检查、Oxfmt 和 Oxlint
+bun run build  # 构建文档站
+```
+
+依赖、工具链和路由变化请参阅 [0.2.0 升级说明](https://doc.raatdf.com/upgrade/)。
 
 # 浏览器兼容性
 
-| 浏览器 | 版本 |
-|---------|---------|
-| Chrome | >= 90 |
-| Edge | >= 90 |
+| 浏览器  | 版本  |
+| ------- | ----- |
+| Chrome  | >= 90 |
+| Edge    | >= 90 |
 | Firefox | >= 88 |
-| Safari | >= 14 |
+| Safari  | >= 14 |
 
 **建议**: 使用最新版本的现代浏览器以获得最佳体验。
 

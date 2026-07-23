@@ -1,7 +1,7 @@
 <div align="center">
 
 [![Deploy to GitHub Pages](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml/badge.svg)](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml)
-[![Deploy to Cloudflare Pages](  https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
+[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://stdf.design/assets/favicon_logo_dark/android-chrome-512x512.png">
@@ -13,11 +13,12 @@
 ![](https://img.shields.io/badge/-React%2019-%2361dafb?logo=react&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Ant%20Design%206-%231890ff?logo=antdesign&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Tailwind%20CSS%204-%2306b6d4?logo=tailwindcss&logoColor=ffffff)
-![](https://img.shields.io/badge/-TypeScript%205-%233178c6?logo=typescript&logoColor=ffffff)
+![](https://img.shields.io/badge/-TypeScript%207-%233178c6?logo=typescript&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Vite%208-%23646cff?logo=vite&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Zustand%205-%23443e38)
 ![](https://img.shields.io/badge/-React%20Router%207-%23ca4245?logo=reactrouter&logoColor=ffffff)
-![](https://img.shields.io/badge/-Biome%202-%2360a5fa?logo=biome&logoColor=ffffff)
+![](https://img.shields.io/badge/-Vite%2B%200.2-%23646cff?logo=vite&logoColor=ffffff)
+![](https://img.shields.io/badge/-Astro%207-%23bc52ee?logo=astro&logoColor=ffffff)
 
 [![GitHub stars](https://img.shields.io/github/stars/any-tdf/raatdf?logo=github&label=star&style=for-the-badge&color=A1DAD7&logoColor=D9F8F2&labelColor=011918)](https://github.com/any-tdf/raatdf)
 [![GitHub license](https://img.shields.io/github/license/any-tdf/raatdf?logo=github&style=for-the-badge&color=B9C46A&logoColor=F3F3CB&labelColor=161901)](https://github.com/any-tdf/raatdf)
@@ -55,14 +56,14 @@ RAATDF è un template di amministrazione aziendale efficiente, elegante e legger
 
 # Stack Tecnologico Principale
 
-- **Strumento di Build**: [Vite](https://vitejs.dev) v8 (Beta) - Esperienza di sviluppo ultraveloce
+- **Strumento di Build**: [Vite+](https://viteplus.dev) v0.2 (Vite 8) - Esperienza di sviluppo ultraveloce
 - **Framework Frontend**: [React](https://react.dev) v19 - Ultima versione con supporto per React Compiler
-- **Sistema di Tipi**: [TypeScript](https://www.typescriptlang.org) v5 - Controllo tipi rigoroso
+- **Sistema di Tipi**: [TypeScript](https://www.typescriptlang.org) v7 - Controllo tipi rigoroso
 - **Framework UI**: [Ant Design](https://ant.design) v6 - Libreria di componenti UI aziendali
 - **Styling**: [Tailwind CSS](https://tailwindcss.com) v4 - Framework CSS atomico
 - **Gestione Stato**: [Zustand](https://zustand-demo.pmnd.rs) v5 - Gestione stato leggera
 - **Routing**: [React Router](https://reactrouter.com) v7 - Soluzione di routing più recente
-- **Qualità Codice**: [Biome](https://biomejs.dev) - Strumento unificato di controllo e formattazione codice
+- **Qualità Codice**: [Vite+](https://viteplus.dev) - Strumento unificato di controllo e formattazione codice
 
 # Funzionalità
 
@@ -107,8 +108,9 @@ RAATDF è un template di amministrazione aziendale efficiente, elegante e legger
 
 ## Requisiti Ambiente
 
-- Node.js >= 18.0.0
-- Bun >= 1.0.0 (raccomandato) o npm/yarn/pnpm
+- Node.js ^22.18.0 o >= 24.11.0
+- Bun >= 1.3.14
+- Vite Plus 0.2.6
 
 ## Installazione e Utilizzo
 
@@ -123,7 +125,7 @@ cd raatdf
 bun install
 
 # Avvia il server di sviluppo
-bun dev
+bun run dev
 
 # Costruisci per la produzione
 bun run build
@@ -136,22 +138,22 @@ bun run preview
 
 ```bash
 # Controllo e formattazione del codice
-bun run check        # Esegui controllo Biome
-bun run check:fix    # Correggi automaticamente problemi codice
-bun run lint         # Controlla solo standard codice
-bun run lint:fix     # Correggi automaticamente problemi standard codice
-bun run format       # Controlla formato codice
-bun run format:fix   # Formatta automaticamente il codice
+bun run check  # Esegui controllo Vite+
+bun run check:fix  # Correggi automaticamente problemi codice
+bun run lint  # Controlla solo standard codice
+bun run lint:fix  # Correggi automaticamente problemi standard codice
+bun run format  # Controlla formato codice
+bun run format:fix  # Formatta automaticamente il codice
 ```
 
 # Compatibilità Browser
 
 | Browser | Versione |
-|---------|---------|
-| Chrome | >= 90 |
-| Edge | >= 90 |
-| Firefox | >= 88 |
-| Safari | >= 14 |
+| ------- | -------- |
+| Chrome  | >= 90    |
+| Edge    | >= 90    |
+| Firefox | >= 88    |
+| Safari  | >= 14    |
 
 **Raccomandazione**: Usa la versione più recente dei browser moderni per la migliore esperienza.
 

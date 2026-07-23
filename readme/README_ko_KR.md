@@ -1,7 +1,7 @@
 <div align="center">
 
 [![Deploy to GitHub Pages](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml/badge.svg)](https://github.com/any-tdf/raatdf/actions/workflows/deploy.yml)
-[![Deploy to Cloudflare Pages](  https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
+[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-doc-blue?style=flat-square&logo=cloudflarepages)](https://doc.raatdf.com)
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://stdf.design/assets/favicon_logo_dark/android-chrome-512x512.png">
@@ -13,11 +13,12 @@
 ![](https://img.shields.io/badge/-React%2019-%2361dafb?logo=react&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Ant%20Design%206-%231890ff?logo=antdesign&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Tailwind%20CSS%204-%2306b6d4?logo=tailwindcss&logoColor=ffffff)
-![](https://img.shields.io/badge/-TypeScript%205-%233178c6?logo=typescript&logoColor=ffffff)
+![](https://img.shields.io/badge/-TypeScript%207-%233178c6?logo=typescript&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Vite%208-%23646cff?logo=vite&logoColor=ffffff)
 ![](https://img.shields.io/badge/-Zustand%205-%23443e38)
 ![](https://img.shields.io/badge/-React%20Router%207-%23ca4245?logo=reactrouter&logoColor=ffffff)
-![](https://img.shields.io/badge/-Biome%202-%2360a5fa?logo=biome&logoColor=ffffff)
+![](https://img.shields.io/badge/-Vite%2B%200.2-%23646cff?logo=vite&logoColor=ffffff)
+![](https://img.shields.io/badge/-Astro%207-%23bc52ee?logo=astro&logoColor=ffffff)
 
 [![GitHub stars](https://img.shields.io/github/stars/any-tdf/raatdf?logo=github&label=star&style=for-the-badge&color=A1DAD7&logoColor=D9F8F2&labelColor=011918)](https://github.com/any-tdf/raatdf)
 [![GitHub license](https://img.shields.io/github/license/any-tdf/raatdf?logo=github&style=for-the-badge&color=B9C46A&logoColor=F3F3CB&labelColor=161901)](https://github.com/any-tdf/raatdf)
@@ -55,14 +56,14 @@ RAATDF는 최신 기술 스택으로 구축된 효율적이고 우아하며 가�
 
 # 핵심 기술 스택
 
-- **빌드 도구**: [Vite](https://vitejs.dev) v8 (Beta) - 초고속 개발 경험
+- **빌드 도구**: [Vite+](https://viteplus.dev) v0.2 (Vite 8) - 초고속 개발 경험
 - **프론트엔드 프레임워크**: [React](https://react.dev) v19 - 최신 버전, React Compiler 지원
-- **타입 시스템**: [TypeScript](https://www.typescriptlang.org) v5 - 엄격한 타입 검사
+- **타입 시스템**: [TypeScript](https://www.typescriptlang.org) v7 - 엄격한 타입 검사
 - **UI 프레임워크**: [Ant Design](https://ant.design) v6 - 엔터프라이즈 UI 컴포넌트 라이브러리
 - **스타일링**: [Tailwind CSS](https://tailwindcss.com) v4 - 원자화 CSS 프레임워크
 - **상태 관리**: [Zustand](https://zustand-demo.pmnd.rs) v5 - 가벼운 상태 관리
 - **라우팅**: [React Router](https://reactrouter.com) v7 - 최신 라우팅 솔루션
-- **코드 품질**: [Biome](https://biomejs.dev) - 통합된 코드 검사 및 포맷팅 도구
+- **코드 품질**: [Vite+](https://viteplus.dev) - 통합된 코드 검사 및 포맷팅 도구
 
 # 기능 특성
 
@@ -107,8 +108,9 @@ RAATDF는 최신 기술 스택으로 구축된 효율적이고 우아하며 가�
 
 ## 환경 요구 사항
 
-- Node.js >= 18.0.0
-- Bun >= 1.0.0(권장) 또는 npm/yarn/pnpm
+- Node.js ^22.18.0 또는 >= 24.11.0
+- Bun >= 1.3.14
+- Vite Plus 0.2.6
 
 ## 설치 및 사용
 
@@ -123,7 +125,7 @@ cd raatdf
 bun install
 
 # 개발 서버 시작
-bun dev
+bun run dev
 
 # 프로덕션 빌드
 bun run build
@@ -136,22 +138,22 @@ bun run preview
 
 ```bash
 # 코드 검사 및 포맷팅
-bun run check        # Biome 검사 실행
-bun run check:fix    # 코드 문제 자동 수정
-bun run lint         # 코드 규범만 검사
-bun run lint:fix     # 코드 규범 문제 자동 수정
-bun run format       # 코드 포맷 검사
-bun run format:fix   # 코드 자동 포맷팅
+bun run check  # Vite+ 검사 실행
+bun run check:fix  # 코드 문제 자동 수정
+bun run lint  # 코드 규범만 검사
+bun run lint:fix  # 코드 규범 문제 자동 수정
+bun run format  # 코드 포맷 검사
+bun run format:fix  # 코드 자동 포맷팅
 ```
 
 # 브라우저 호환성
 
-| 브라우저 | 버전 |
-|---------|---------|
-| Chrome | >= 90 |
-| Edge | >= 90 |
-| Firefox | >= 88 |
-| Safari | >= 14 |
+| 브라우저 | 버전  |
+| -------- | ----- |
+| Chrome   | >= 90 |
+| Edge     | >= 90 |
+| Firefox  | >= 88 |
+| Safari   | >= 14 |
 
 **권장**: 최상의 경험을 위해 최신 버전의 모던 브라우저를 사용하세요.
 
