@@ -1,5 +1,6 @@
 import { Button, Result, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
+
 import { getErrorsLocale } from '@/locales';
 import { useSystemStore } from '@/store';
 

@@ -9,14 +9,20 @@ import { type ComponentType, lazy } from 'react';
  * 使用 Vite glob 导入扫描所有页面文件
  * eager: false 表示懒加载
  */
-const pageModules = import.meta.glob<{ default: ComponentType }>('../pages/**/*.tsx');
+const pageModules = import.meta.glob<{ default: ComponentType }>([
+	'../pages/**/*.tsx',
+	'!../pages/**/*.test.tsx',
+	'!../pages/auth/**/*.tsx',
+	'!../pages/errors/**/*.tsx',
+	'!../pages/**/_*/**/*.tsx',
+]);
 
 /**
  * 排除的路径模式
  * - /auth/ : 认证页面单独处理
  * - /_ : 下划线开头的为私有模块
  */
-const EXCLUDED_PATTERNS = ['/auth/', '/_'];
+const EXCLUDED_PATTERNS = ['/auth/', '/errors/', '/_'];
 
 /**
  * 检查文件是否应该被排除

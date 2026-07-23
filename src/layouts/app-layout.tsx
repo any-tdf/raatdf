@@ -2,16 +2,20 @@ import type { MenuProps } from 'antd';
 import { App, Avatar, Breadcrumb, Button, Dropdown, Layout, Menu, Popover, Space } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
 import type { MenuItem } from '@/api/mocks/menu';
 import { system } from '@/components';
+import { useSystemSettingsDrawer } from '@/components/system/settings/use-system-settings-drawer';
 import {
 	buildAccountMenuItems,
 	handleAccountMenuClick as handleAccountMenuItemClick,
 } from '@/layouts/account-menu-items';
 import type { HeaderIconButton } from '@/layouts/toolbar-buttons';
-import { getButtonLabel, toolbarButtons } from '@/layouts/toolbar-buttons';
+import { toolbarButtons, useHasUnreadNotifications } from '@/layouts/toolbar-buttons';
+import { getToolbarButtonLabel } from '@/layouts/toolbar-locales';
 import { getCommonLocale } from '@/locales';
-import { useMenuStore, useSystemSettingsDrawer, useSystemStore, useUserStore } from '@/store';
+import { logout } from '@/services/auth-service';
+import { useMenuStore, useSystemStore, useUserStore } from '@/store';
 import type { Locale } from '@/store/types';
 import { canAccessPage } from '@/utils/permissions';
 
@@ -28,12 +32,19 @@ interface ToolbarButtonProps {
 
 /** 工具栏按钮组件（支持折叠/展开两种模式） */
 function ToolbarButton({ item, borderRadius, collapsed, locale, popoverStates, setPopoverStates }: ToolbarButtonProps) {
-	const shouldShowDot = item.popover?.shouldShowDot ? item.popover.shouldShowDot() : item.dot;
-	const label = item.labelKey ? getButtonLabel(item.labelKey, locale) : item.key;
+	const hasUnreadNotifications = useHasUnreadNotifications(locale);
+	const shouldShowDot =
+		item.key === 'notification'
+			? hasUnreadNotifications
+			: item.popover?.shouldShowDot
+				? item.popover.shouldShowDot()
+				: item.dot;
+	const label = item.labelKey ? getToolbarButtonLabel(item.labelKey, locale) : item.key;
 
 	const button = collapsed ? (
 		<Button
 			type="text"
+			aria-label={label}
 			onClick={item.popover ? undefined : item.onClick}
 			style={{
 				width: '40px',
@@ -61,6 +72,7 @@ function ToolbarButton({ item, borderRadius, collapsed, locale, popoverStates, s
 	) : (
 		<Button
 			type="text"
+			aria-label={label}
 			onClick={item.popover ? undefined : item.onClick}
 			style={{
 				width: '100%',
@@ -110,7 +122,6 @@ interface AppLayoutProps {
 	breadcrumbs?: Array<{ title: string; path?: string }>;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 主布局组件需要处理多种布局模式、主题设置和状态管理
 function AppLayout({ breadcrumbs }: AppLayoutProps) {
 	// 从 Ant Design App 组件获取 modal 和 message 实例（支持深色模式）
 	const { modal, message } = App.useApp();
@@ -126,6 +137,8 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 		showCollapseButton,
 		menuCollapsed,
 		setMenuCollapsed,
+		activeTopMenuKey: mixedLayoutSelectedTopMenu,
+		setActiveTopMenuKey: setMixedLayoutSelectedTopMenu,
 		showHeaderButtons,
 		showTabs,
 		isImmersiveMode,
@@ -133,10 +146,10 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 		showContentBackground,
 		addTab,
 		fixedWidthMax,
-		clearAllTabsAndCache,
 		sidebarToolbar,
 	} = useSystemStore();
-	const { userInfo, clearUserInfo } = useUserStore();
+	const hasUnreadNotifications = useHasUnreadNotifications(locale);
+	const { userInfo } = useUserStore();
 	const { loadMenuData } = useMenuStore();
 	const { open, showDrawer, hideDrawer } = useSystemSettingsDrawer();
 	const navigate = useNavigate();
@@ -144,9 +157,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 
 	// 管理所有 Popover 的打开状态
 	const [popoverStates, setPopoverStates] = useState<Record<string, boolean>>({});
-
-	// 菜单折叠状态的 localStorage key
-	const MENU_COLLAPSED_KEY = 'ant_admin_menu_collapsed';
 
 	// 获取当前路径应该展开的父级菜单键
 	const getParentKeys = useCallback((items: MenuItem[], targetPath: string, currentPath: string[] = []): string[] => {
@@ -203,7 +213,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 		const path = location.pathname;
 
 		// 查找当前路径对应的菜单项及其父级
-		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 需要递归查找菜单树中的目标路径及其父级菜单
 		const findTopLevelMenu = (items: MenuItem[], targetPath: string): string => {
 			for (const item of items) {
 				// 检查当前项或其子项是否匹配路径
@@ -230,33 +239,22 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 		return findTopLevelMenu(menuData, path);
 	}, [location.pathname, findMenuItemByPath, menuData]);
 
-	const [localCollapsed, setLocalCollapsed] = useState(() => {
-		// 从 localStorage 读取菜单折叠状态
-		const savedCollapsed = localStorage.getItem(MENU_COLLAPSED_KEY);
-		return savedCollapsed !== null ? JSON.parse(savedCollapsed) : false;
-	});
 	const [openKeys, setOpenKeys] = useState<string[]>([]);
 
-	// 根据是否显示折叠按钮来决定使用哪个状态
-	const collapsed = showCollapseButton ? localCollapsed : menuCollapsed;
-	const setCollapsed = showCollapseButton ? setLocalCollapsed : setMenuCollapsed;
-
-	// 混合布局中当前选中的顶级菜单
-	const [mixedLayoutSelectedTopMenu, setMixedLayoutSelectedTopMenu] = useState<string>(() => {
-		return 'dashboard'; // 初始值设为 dashboard，稍后会在 useEffect 中更新
-	});
-
-	// 保存菜单折叠状态（仅在显示折叠按钮时保存到 localStorage）
-	useEffect(() => {
-		if (showCollapseButton) {
-			localStorage.setItem(MENU_COLLAPSED_KEY, JSON.stringify(localCollapsed));
-		}
-	}, [localCollapsed, showCollapseButton]);
+	const collapsed = menuCollapsed;
+	const setCollapsed = setMenuCollapsed;
 
 	// 监听语言变化，加载对应语言的菜单数据
 	useEffect(() => {
-		loadMenuData(locale);
-	}, [locale, loadMenuData]);
+		const refreshMenu = async () => {
+			try {
+				await loadMenuData(locale);
+			} catch (error) {
+				message.error(error instanceof Error ? error.message : '菜单加载失败');
+			}
+		};
+		void refreshMenu();
+	}, [locale, loadMenuData, message]);
 
 	// 初始化菜单展开状态
 	useEffect(() => {
@@ -300,18 +298,10 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 		menuData,
 	]);
 
-	// 保存混合布局选中的顶级菜单到 localStorage，用于定宽布局计算
-	useEffect(() => {
-		if (menuLayout === 'mixed') {
-			localStorage.setItem('mixedLayoutSelectedTopMenu', mixedLayoutSelectedTopMenu);
-		}
-	}, [mixedLayoutSelectedTopMenu, menuLayout]);
-
 	// 将后端菜单数据转换为 Ant Design Menu 格式
 	const transformMenuData = (items: MenuItem[]): MenuProps['items'] => {
 		const result: MenuProps['items'] = [];
 		for (const item of items) {
-			// biome-ignore lint/suspicious/noExplicitAny: Ant Design Menu 的 items 类型较为复杂，使用 any 简化类型定义
 			const menuItem: any = {
 				key: item.key,
 				label: item.label,
@@ -397,7 +387,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 
 		// 如果点击的是没有子菜单的项目，直接导航
 		if (item && (!item.children || item.children.length === 0) && item.path) {
-			navigate(item.path);
+			void navigate(item.path);
 		}
 	};
 	// 根据菜单项 key 查找路径
@@ -457,12 +447,12 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 			// 检查权限
 			if (!canAccessPage(path)) {
 				message.error(commonLocale.permission.noAccess);
-				navigate('/403');
+				void navigate('/403');
 				return;
 			}
 
 			// 导航
-			navigate(path);
+			void navigate(path);
 		}
 	};
 
@@ -489,29 +479,9 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 
 	// 退出登录处理
 	const handleLogout = async () => {
-		try {
-			// 清除本地存储的认证信息
-			localStorage.removeItem('auth_token');
-			localStorage.removeItem('login_time');
-			localStorage.removeItem('last_username');
-
-			// 清除用户信息
-			clearUserInfo();
-
-			// 清除所有标签页和缓存，避免新用户看到旧用户的页面
-			clearAllTabsAndCache();
-
-			// 显示成功消息
-			message.success(commonLocale.accountMenu.logoutSuccess);
-
-			// 延迟 500ms 后重定向到登录页面，让用户看到成功提示
-			setTimeout(() => {
-				navigate('/login');
-			}, 500);
-		} catch (error) {
-			console.error('退出登录失败：', error);
-			message.error(commonLocale.accountMenu.logoutFailed);
-		}
+		await logout();
+		message.success(commonLocale.accountMenu.logoutSuccess);
+		void navigate('/login', { replace: true });
 	};
 
 	const logoStyle: React.CSSProperties = isFloatingUI
@@ -594,7 +564,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 	};
 
 	// 根据布局模式获取内容区域样式
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 布局样式计算逻辑需要处理多种布局模式和状态组合
 	const getContentStyle = (layout: 'vertical' | 'horizontal' | 'mixed'): React.CSSProperties => {
 		let height: string;
 
@@ -656,6 +625,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 					<Button
 						type="text"
 						icon={<i className="ri-settings-3-line icon-spin-hover" style={{ fontSize: '18px' }} />}
+						aria-label={commonLocale.drawer.systemSettings}
 						onClick={showDrawer}
 						style={{
 							width: '40px',
@@ -691,10 +661,16 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 				)}
 
 				{/* 账号菜单 */}
-				<Dropdown menu={{ items: accountMenuItems, onClick: handleAccountMenuClick }} placement="topRight">
+				<Dropdown
+					menu={{ items: accountMenuItems, onClick: handleAccountMenuClick }}
+					placement="topRight"
+					trigger={['click']}
+				>
 					{collapsed ? (
-						<div
-							className="flex cursor-pointer items-center justify-center overflow-hidden p-0"
+						<button
+							type="button"
+							aria-label={commonLocale.accountMenu.open}
+							className="flex cursor-pointer items-center justify-center overflow-hidden border-0 bg-transparent p-0"
 							style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
 						>
 							<Avatar
@@ -702,10 +678,12 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 								size={40}
 								style={{ borderRadius: `${borderRadius}px` }}
 							/>
-						</div>
+						</button>
 					) : (
-						<div
-							className="flex cursor-pointer items-center gap-2.5 rounded px-3 py-2 transition-colors hover:bg-(--ant-color-fill-secondary)"
+						<button
+							type="button"
+							aria-label={commonLocale.accountMenu.open}
+							className="flex w-full cursor-pointer items-center gap-2.5 rounded border-0 bg-transparent px-3 py-2 text-left transition-colors hover:bg-(--ant-color-fill-secondary)"
 							style={{ borderRadius: `${borderRadius}px` }}
 						>
 							<Avatar
@@ -714,12 +692,12 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 								style={{ borderRadius: `${borderRadius}px`, flexShrink: 0 }}
 							/>
 							<div className="min-w-0 flex-1">
-								<div className="truncate font-medium text-sm">{userInfo?.nickname || userInfo?.username || '用户'}</div>
+								<div className="truncate text-sm font-medium">{userInfo?.username}</div>
 								<div className="truncate text-xs" style={{ color: 'var(--ant-color-text-tertiary)' }}>
-									{userInfo?.email || ''}
+									{userInfo?.email}
 								</div>
 							</div>
-						</div>
+						</button>
 					)}
 				</Dropdown>
 			</div>
@@ -727,7 +705,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 	};
 
 	// 渲染垂直布局
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 布局渲染函数包含多个条件分支和嵌套结构
 	const renderVerticalLayout = () => {
 		// 计算侧边栏工具栏高度，用于调整菜单高度
 		// 折叠模式：每个按钮 40px + 6px gap + 8px padding * 2
@@ -745,7 +722,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 					<div style={logoStyle}>
 						<div className={`flex items-center ${collapsed ? '' : 'space-x-2'}`}>
 							<system.Logo size={collapsed ? 20 : 18} />
-							{!collapsed && <div className="m-0 whitespace-nowrap font-bold text-sm">{commonLocale.system.name}</div>}
+							{!collapsed && <div className="m-0 text-sm font-bold whitespace-nowrap">{commonLocale.system.name}</div>}
 						</div>
 					</div>
 				)}
@@ -777,12 +754,12 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 							>
 								<div className={`flex items-center ${collapsed ? '' : 'gap-2'}`}>
 									<system.Logo size={18} />
-									{!collapsed && <div className="whitespace-nowrap font-bold text-sm">{commonLocale.system.name}</div>}
+									{!collapsed && <div className="text-sm font-bold whitespace-nowrap">{commonLocale.system.name}</div>}
 								</div>
 							</div>
 						)}
 
-						<div className="flex-1 overflow-y-auto overflow-x-hidden">
+						<div className="flex-1 overflow-x-hidden overflow-y-auto">
 							<Menu
 								mode="inline"
 								items={fullMenuItems}
@@ -821,7 +798,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 	};
 
 	// 渲染水平布局
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 布局渲染函数包含多个条件分支和嵌套结构
 	const renderHorizontalLayout = () => (
 		<Layout style={{ minHeight: '100vh', background: 'transparent' }}>
 			{isFloatingUI && (
@@ -831,7 +807,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 						<div className={`flex items-center ${collapsed ? '' : 'space-x-2'}`}>
 							<system.Logo size={collapsed ? 20 : 18} />
 							{!collapsed && (
-								<div className="font-bold text-sm" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+								<div className="text-sm font-bold" style={{ margin: 0, whiteSpace: 'nowrap' }}>
 									{commonLocale.system.name}
 								</div>
 							)}
@@ -840,7 +816,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 						<div className={`flex items-center ${collapsed ? '' : 'space-x-2'}`}>
 							<system.Logo size={collapsed ? 20 : 18} />
 							{!collapsed && (
-								<div className="font-bold text-sm" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+								<div className="text-sm font-bold" style={{ margin: 0, whiteSpace: 'nowrap' }}>
 									{commonLocale.system.name}
 								</div>
 							)}
@@ -871,6 +847,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 						<Button
 							type="text"
 							icon={<i className="ri-refresh-line icon-spin-hover" style={{ fontSize: '16px' }} />}
+							aria-label={commonLocale.display.refreshButton}
 							onClick={() => window.location.reload()}
 							style={{
 								display: 'flex',
@@ -916,7 +893,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 	);
 
 	// 渲染混合布局
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 布局渲染函数包含多个条件分支和嵌套结构
 	const renderMixedLayout = () => (
 		<Layout style={{ minHeight: '100vh', background: 'transparent' }}>
 			{isFloatingUI && (
@@ -926,7 +902,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 						<div className={`flex items-center ${collapsed ? '' : 'space-x-2'}`}>
 							<system.Logo size={collapsed ? 20 : 18} />
 							{!collapsed && (
-								<div className="font-bold text-sm" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+								<div className="text-sm font-bold" style={{ margin: 0, whiteSpace: 'nowrap' }}>
 									{commonLocale.system.name}
 								</div>
 							)}
@@ -935,7 +911,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 						<div className={`flex items-center ${collapsed ? '' : 'space-x-2'}`}>
 							<system.Logo size={collapsed ? 20 : 18} />
 							{!collapsed && (
-								<div className="font-bold text-sm" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+								<div className="text-sm font-bold" style={{ margin: 0, whiteSpace: 'nowrap' }}>
 									{commonLocale.system.name}
 								</div>
 							)}
@@ -971,7 +947,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 									<div className={`flex items-center ${collapsed ? '' : 'gap-2'}`}>
 										<system.Logo size={18} />
 										{!collapsed && (
-											<div className="whitespace-nowrap font-bold text-sm">{commonLocale.system.name}</div>
+											<div className="text-sm font-bold whitespace-nowrap">{commonLocale.system.name}</div>
 										)}
 									</div>
 								</div>
@@ -993,6 +969,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 										)
 									}
 									onClick={() => setCollapsed(!collapsed)}
+									aria-label={collapsed ? commonLocale.display.expandMenu : commonLocale.display.collapseButton}
 									style={{
 										width: '40px',
 										height: '40px',
@@ -1015,6 +992,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 							<Button
 								type="text"
 								icon={<i className="ri-refresh-line icon-spin-hover" style={{ fontSize: '16px' }} />}
+								aria-label={commonLocale.display.refreshButton}
 								onClick={() => window.location.reload()}
 								style={{
 									display: 'flex',
@@ -1052,7 +1030,6 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 			</Header>
 
 			<Layout style={{ height: isFloatingUI ? 'calc(100vh - 72px)' : 'calc(100vh - 48px)' }}>
-				{/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 混合布局中的子菜单渲染逻辑需要多个条件判断 */}
 				{(() => {
 					const subMenuItems = getSubMenuItems(mixedLayoutSelectedTopMenu);
 					const hasSubMenu = subMenuItems && subMenuItems.length > 0;
@@ -1118,12 +1095,18 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 				{showHeaderButtons &&
 					toolbarButtons.map((item) => {
 						// 判断是否显示红点
-						const shouldShowDot = item.popover?.shouldShowDot ? item.popover.shouldShowDot() : item.dot;
+						const shouldShowDot =
+							item.key === 'notification'
+								? hasUnreadNotifications
+								: item.popover?.shouldShowDot
+									? item.popover.shouldShowDot()
+									: item.dot;
 
 						const button = (
 							<Button
 								key={item.key}
 								type="text"
+								aria-label={item.labelKey ? getToolbarButtonLabel(item.labelKey, locale) : item.key}
 								onClick={item.popover ? undefined : item.onClick}
 								style={{
 									width: '40px',
@@ -1182,6 +1165,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 				<Button
 					type="text"
 					icon={<i className="ri-settings-3-line icon-spin-hover" style={{ fontSize: '16px' }} />}
+					aria-label={commonLocale.drawer.systemSettings}
 					onClick={showDrawer}
 					style={{
 						width: '40px',
@@ -1198,8 +1182,16 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 				/>
 
 				{/* 账号菜单 - 始终显示 */}
-				<Dropdown menu={{ items: accountMenuItems, onClick: handleAccountMenuClick }} placement="bottomRight">
-					<div className="flex h-10 min-h-10 w-10 min-w-10 cursor-pointer items-center justify-center overflow-hidden p-0">
+				<Dropdown
+					menu={{ items: accountMenuItems, onClick: handleAccountMenuClick }}
+					placement="bottomRight"
+					trigger={['click']}
+				>
+					<button
+						type="button"
+						aria-label={commonLocale.accountMenu.open}
+						className="flex h-10 min-h-10 w-10 min-w-10 cursor-pointer items-center justify-center overflow-hidden border-0 bg-transparent p-0"
+					>
 						<Avatar
 							src={userInfo?.avatar || '/images/default-avatar.jpg'}
 							size={40}
@@ -1207,7 +1199,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 								borderRadius: `${borderRadius}px`,
 							}}
 						/>
-					</div>
+					</button>
 				</Dropdown>
 			</Space>
 		);
@@ -1228,6 +1220,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 							)
 						}
 						onClick={() => setCollapsed(!collapsed)}
+						aria-label={collapsed ? commonLocale.display.expandMenu : commonLocale.display.collapseButton}
 						style={{
 							width: '40px',
 							height: '40px',
@@ -1247,6 +1240,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 					<Button
 						type="text"
 						icon={<i className="ri-refresh-line icon-spin-hover" style={{ fontSize: '16px' }} />}
+						aria-label={commonLocale.display.refreshButton}
 						onClick={() => window.location.reload()}
 						style={{
 							width: '40px',
@@ -1295,6 +1289,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 							)
 						}
 						onClick={() => setCollapsed(!collapsed)}
+						aria-label={collapsed ? commonLocale.display.expandMenu : commonLocale.display.collapseButton}
 						style={{
 							width: '40px',
 							height: '40px',
@@ -1314,6 +1309,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 					<Button
 						type="text"
 						icon={<i className="ri-refresh-line icon-spin-hover" style={{ fontSize: '16px' }} />}
+						aria-label={commonLocale.display.refreshButton}
 						onClick={() => window.location.reload()}
 						style={{
 							width: '40px',
@@ -1362,6 +1358,7 @@ function AppLayout({ breadcrumbs }: AppLayoutProps) {
 					<Button
 						type="primary"
 						icon={<i className="ri-fullscreen-exit-line" style={{ fontSize: '12px' }} />}
+						aria-label={commonLocale.display.immersiveMode}
 						onClick={() => setImmersiveMode(false)}
 						style={{
 							width: '28px',

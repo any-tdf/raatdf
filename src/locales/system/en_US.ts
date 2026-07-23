@@ -1,6 +1,7 @@
 import { enUSIntl } from '@ant-design/pro-components';
 import datePickerEnUS from 'antd/es/date-picker/locale/en_US';
 import enUS from 'antd/locale/en_US';
+
 import type { LocalizationConfig } from './types';
 
 /**
@@ -124,6 +125,7 @@ const enUSConfig: LocalizationConfig = {
 			systemSettings: 'System Settings',
 		},
 		accountMenu: {
+			open: 'Open account menu',
 			logout: 'Logout',
 			logoutConfirmTitle: 'Logout',
 			logoutConfirmContent: 'Are you sure you want to logout?',
@@ -134,14 +136,26 @@ const enUSConfig: LocalizationConfig = {
 			noAccess: 'You do not have permission to access this page',
 		},
 		tabContextMenu: {
+			actionsLabel: 'Tab actions',
 			pin: 'Pin',
 			unpin: 'Unpin',
+			closeTab: 'Close tab',
+			unpinTab: 'Unpin tab',
 			closeLeft: 'Close Left',
 			closeRight: 'Close Right',
 			closeOthers: 'Close Others',
 		},
 		loading: {
 			checkingAuth: 'Checking login status...',
+			loadingPage: 'Loading page...',
+		},
+		docs: {
+			openExternal: 'Open in new window',
+			loading: 'Loading project documentation',
+			timeoutTitle: 'Documentation load timed out',
+			timeoutDescription: 'Retry loading or open the documentation site in a new window.',
+			retry: 'Reload',
+			iframeTitle: 'RAATDF project documentation',
 		},
 	},
 	config: {

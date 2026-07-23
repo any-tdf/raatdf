@@ -1,4 +1,5 @@
 import { Button, Tooltip } from 'antd';
+
 import { ThemeMode, useSystemStore } from '@/store';
 
 /**
@@ -39,6 +40,7 @@ function ThemeToggle() {
 				type="text"
 				icon={<i className={`${getThemeIcon()} text-lg`} />}
 				onClick={toggleTheme}
+				aria-label={`切换主题，当前为${getThemeLabel()}`}
 				style={{
 					display: 'flex',
 					alignItems: 'center',

@@ -155,6 +155,7 @@ export interface CommonUI {
 	};
 	// 账户菜单
 	accountMenu: {
+		open: string;
 		logout: string;
 		logoutConfirmTitle: string;
 		logoutConfirmContent: string;
@@ -167,8 +168,11 @@ export interface CommonUI {
 	};
 	// 标签页右键菜单
 	tabContextMenu: {
+		actionsLabel: string;
 		pin: string;
 		unpin: string;
+		closeTab: string;
+		unpinTab: string;
 		closeLeft: string;
 		closeRight: string;
 		closeOthers: string;
@@ -176,6 +180,16 @@ export interface CommonUI {
 	// 加载状态
 	loading: {
 		checkingAuth: string;
+		loadingPage: string;
+	};
+	// 文档入口
+	docs: {
+		openExternal: string;
+		loading: string;
+		timeoutTitle: string;
+		timeoutDescription: string;
+		retry: string;
+		iframeTitle: string;
 	};
 }
 

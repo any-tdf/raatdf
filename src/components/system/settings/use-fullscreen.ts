@@ -2,6 +2,7 @@
  * 全屏状态管理 Hook
  */
 import { useEffect, useState } from 'react';
+
 import type { DocumentWithFullscreen, HTMLElementWithFullscreen } from '@/types/browser';
 
 export function useFullscreen() {
@@ -45,13 +46,13 @@ export function useFullscreen() {
 function enterFullscreen() {
 	const element = document.documentElement as HTMLElementWithFullscreen;
 	if (element.requestFullscreen) {
-		element.requestFullscreen();
+		void element.requestFullscreen();
 	} else if (element.webkitRequestFullscreen) {
-		element.webkitRequestFullscreen();
+		void element.webkitRequestFullscreen();
 	} else if (element.mozRequestFullScreen) {
-		element.mozRequestFullScreen();
+		void element.mozRequestFullScreen();
 	} else if (element.msRequestFullscreen) {
-		element.msRequestFullscreen();
+		void element.msRequestFullscreen();
 	}
 }
 
@@ -61,12 +62,12 @@ function enterFullscreen() {
 function exitFullscreen() {
 	const doc = document as DocumentWithFullscreen;
 	if (document.exitFullscreen) {
-		document.exitFullscreen();
+		void document.exitFullscreen();
 	} else if (doc.webkitExitFullscreen) {
-		doc.webkitExitFullscreen();
+		void doc.webkitExitFullscreen();
 	} else if (doc.mozCancelFullScreen) {
-		doc.mozCancelFullScreen();
+		void doc.mozCancelFullScreen();
 	} else if (doc.msExitFullscreen) {
-		doc.msExitFullscreen();
+		void doc.msExitFullscreen();
 	}
 }

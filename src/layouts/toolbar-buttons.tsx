@@ -1,5 +1,5 @@
 /**
- * 工具栏图标按钮配置
+ * 工具栏图标按钮与弹出内容配置
  *
  * 在此文件中配置工具栏的图标按钮及相关组件
  * 按钮将按数组顺序从左到右显示
@@ -10,65 +10,41 @@
  * - 侧边栏底部（当 sidebarToolbar 启用且为垂直布局时）
  */
 
-import { Button, Empty, List, Space } from 'antd';
-import { useState } from 'react';
-import type { Notification } from '@/api/mocks/notifications';
-import { getNotificationData } from '@/api/mocks/notifications';
+import { Button, Empty, Space } from 'antd';
+import { useMemo } from 'react';
+
+import { getNotificationData, type Notification } from '@/api/mocks/notifications';
+import { getToolbarLocale } from '@/layouts/toolbar-locales';
 import type { Locale } from '@/locales/system/types';
-import { useSystemStore } from '@/store';
+import { useNotificationStore, useSystemStore } from '@/store';
 
-// ==================== 国际化配置 ====================
-
-/**
- * 通知和聊天的国际化配置
- */
-const i18nConfig = {
-	'zh-CN': {
-		notification: {
-			title: '通知中心',
-			empty: '暂无通知消息',
-			unreadCount: '条未读',
-			markAllRead: '全部已读',
-			clear: '清空',
-		},
-		chat: {
-			title: '聊天',
-			developing: '聊天功能开发中...',
-			close: '关闭',
-		},
-		// 侧边栏工具栏按钮标签
-		buttonLabels: {
-			notification: '通知中心',
-			chat: '聊天窗口',
-		},
-	},
-	'en-US': {
-		notification: {
-			title: 'Notification Center',
-			empty: 'No notifications',
-			unreadCount: 'unread',
-			markAllRead: 'Mark all read',
-			clear: 'Clear',
-		},
-		chat: {
-			title: 'Chat',
-			developing: 'Chat feature is under development...',
-			close: 'Close',
-		},
-		// 侧边栏工具栏按钮标签
-		buttonLabels: {
-			notification: 'Notifications',
-			chat: 'Chat Box',
-		},
-	},
+const notificationIconMap: Record<Notification['type'], string> = {
+	info: 'ri-information-line',
+	success: 'ri-checkbox-circle-line',
+	warning: 'ri-error-warning-line',
+	error: 'ri-close-circle-line',
 };
 
-/**
- * 获取国际化文本
- */
-function getI18nText(locale: Locale) {
-	return i18nConfig[locale];
-}
+const notificationColorMap: Record<Notification['type'], string> = {
+	info: 'var(--ant-color-info)',
+	success: 'var(--ant-color-success)',
+	warning: 'var(--ant-color-warning)',
+	error: 'var(--ant-color-error)',
+};
+
+const notificationBackgroundMap: Record<Notification['type'], string> = {
+	info: 'var(--ant-color-info-bg)',
+	success: 'var(--ant-color-success-bg)',
+	warning: 'var(--ant-color-warning-bg)',
+	error: 'var(--ant-color-error-bg)',
+};
+
+export const useHasUnreadNotifications = (locale: Locale): boolean => {
+	const { readIds, hiddenIds } = useNotificationStore();
+	return getNotificationData(locale).some(
+		(notification) => !hiddenIds.includes(notification.id) && !notification.read && !readIds.includes(notification.id)
+	);
+};
 
 // ==================== 通知列表组件 ====================
 
@@ -82,26 +58,36 @@ interface NotificationListProps {
  */
 function NotificationList({ onClose }: NotificationListProps) {
 	const { locale } = useSystemStore();
-	const t = getI18nText(locale);
-	const [notifications, setNotifications] = useState<Notification[]>(getNotificationData(locale));
+	const t = getToolbarLocale(locale);
+	const { readIds, hiddenIds, markRead, markAllRead, hideAll } = useNotificationStore();
+	const notifications = useMemo(
+		() =>
+			getNotificationData(locale)
+				.filter((notification) => !hiddenIds.includes(notification.id))
+				.map((notification) => ({
+					...notification,
+					read: notification.read || readIds.includes(notification.id),
+				})),
+		[hiddenIds, locale, readIds]
+	);
 
 	// 获取未读通知数量
 	const unreadCount = notifications.filter((n) => !n.read).length;
 
 	// 处理通知项点击
 	const handleNotificationClick = (id: string) => {
-		setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+		markRead(id);
 	};
 
 	// 清空所有通知
 	const handleClearAll = () => {
-		setNotifications([]);
+		hideAll(notifications.map((notification) => notification.id));
 		onClose?.();
 	};
 
 	// 标记所有为已读
 	const handleMarkAllRead = () => {
-		setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+		markAllRead(notifications.map((notification) => notification.id));
 	};
 
 	return (
@@ -169,134 +155,112 @@ function NotificationList({ onClose }: NotificationListProps) {
 					style={{ padding: '64px 0', margin: 0 }}
 				/>
 			) : (
-				<div style={{ maxHeight: '420px', overflowY: 'auto' }}>
-					<List
-						dataSource={notifications}
-						split={false}
-						renderItem={(item) => {
-							const iconMap = {
-								info: 'ri-information-line',
-								success: 'ri-checkbox-circle-line',
-								warning: 'ri-error-warning-line',
-								error: 'ri-close-circle-line',
-							};
-
-							const colorMap = {
-								info: 'var(--ant-color-info)',
-								success: 'var(--ant-color-success)',
-								warning: 'var(--ant-color-warning)',
-								error: 'var(--ant-color-error)',
-							};
-
-							const bgColorMap = {
-								info: 'var(--ant-color-info-bg)',
-								success: 'var(--ant-color-success-bg)',
-								warning: 'var(--ant-color-warning-bg)',
-								error: 'var(--ant-color-error-bg)',
-							};
-
-							return (
-								<List.Item
-									key={item.id}
-									onClick={() => handleNotificationClick(item.id)}
+				<ul style={{ maxHeight: '420px', overflowY: 'auto', margin: 0, padding: 0, listStyle: 'none' }}>
+					{notifications.map((item) => (
+						<li key={item.id} style={{ borderBottom: '1px solid var(--ant-color-border-secondary)' }}>
+							<button
+								type="button"
+								className="notification-item-button"
+								onClick={() => handleNotificationClick(item.id)}
+								aria-label={`${item.title}: ${item.content}`}
+								style={{
+									width: '100%',
+									padding: '16px 20px',
+									border: 0,
+									background: 'transparent',
+									color: 'inherit',
+									cursor: 'pointer',
+									display: 'flex',
+									alignItems: 'flex-start',
+									gap: '12px',
+									textAlign: 'left',
+									transition: 'background-color 0.2s ease',
+								}}
+							>
+								<span
+									aria-hidden="true"
 									style={{
-										padding: '16px 20px',
-										cursor: 'pointer',
-										backgroundColor: 'transparent',
-										borderBottom: '1px solid var(--ant-color-border-secondary)',
-										transition: 'all 0.2s ease',
+										width: '40px',
+										height: '40px',
+										borderRadius: '50%',
+										backgroundColor: notificationBackgroundMap[item.type],
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										flexShrink: 0,
 									}}
 								>
-									<List.Item.Meta
-										avatar={
-											<div
+									<i
+										className={notificationIconMap[item.type]}
+										style={{ fontSize: '20px', color: notificationColorMap[item.type] }}
+									/>
+								</span>
+								<span style={{ minWidth: 0, flex: 1 }}>
+									<span
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											marginBottom: '4px',
+										}}
+									>
+										<span style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+											<span
 												style={{
-													width: '40px',
-													height: '40px',
-													borderRadius: '50%',
-													backgroundColor: bgColorMap[item.type],
-													display: 'flex',
-													alignItems: 'center',
-													justifyContent: 'center',
+													fontWeight: item.read ? 400 : 600,
+													fontSize: '14px',
+													color: 'var(--ant-color-text)',
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													whiteSpace: 'nowrap',
 												}}
 											>
-												<i
-													className={iconMap[item.type]}
+												{item.title}
+											</span>
+											{!item.read && (
+												<span
+													aria-hidden="true"
 													style={{
-														fontSize: '20px',
-														color: colorMap[item.type],
+														width: '6px',
+														height: '6px',
+														borderRadius: '50%',
+														backgroundColor: 'var(--ant-color-error)',
+														flexShrink: 0,
 													}}
 												/>
-											</div>
-										}
-										title={
-											<div
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													justifyContent: 'space-between',
-													marginBottom: '4px',
-												}}
-											>
-												<div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-													<span
-														style={{
-															fontWeight: item.read ? 400 : 600,
-															fontSize: '14px',
-															color: 'var(--ant-color-text)',
-															overflow: 'hidden',
-															textOverflow: 'ellipsis',
-															whiteSpace: 'nowrap',
-														}}
-													>
-														{item.title}
-													</span>
-													{!item.read && (
-														<span
-															style={{
-																width: '6px',
-																height: '6px',
-																borderRadius: '50%',
-																backgroundColor: 'var(--ant-color-error)',
-																flexShrink: 0,
-															}}
-														/>
-													)}
-												</div>
-												<div
-													style={{
-														display: 'flex',
-														alignItems: 'center',
-														gap: '4px',
-														fontSize: '12px',
-														color: 'var(--ant-color-text-tertiary)',
-														flexShrink: 0,
-														marginLeft: '12px',
-														whiteSpace: 'nowrap',
-													}}
-												>
-													<i className="ri-time-line" style={{ fontSize: '12px' }} />
-													{item.time}
-												</div>
-											</div>
-										}
-										description={
-											<div
-												style={{
-													color: 'var(--ant-color-text-secondary)',
-													fontSize: '13px',
-													lineHeight: '1.6',
-												}}
-											>
-												{item.content}
-											</div>
-										}
-									/>
-								</List.Item>
-							);
-						}}
-					/>
-				</div>
+											)}
+										</span>
+										<span
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '4px',
+												fontSize: '12px',
+												color: 'var(--ant-color-text-tertiary)',
+												flexShrink: 0,
+												marginLeft: '12px',
+												whiteSpace: 'nowrap',
+											}}
+										>
+											<i className="ri-time-line" aria-hidden="true" style={{ fontSize: '12px' }} />
+											{item.time}
+										</span>
+									</span>
+									<span
+										style={{
+											display: 'block',
+											color: 'var(--ant-color-text-secondary)',
+											fontSize: '13px',
+											lineHeight: '1.6',
+										}}
+									>
+										{item.content}
+									</span>
+								</span>
+							</button>
+						</li>
+					))}
+				</ul>
 			)}
 		</div>
 	);
@@ -306,13 +270,6 @@ function NotificationList({ onClose }: NotificationListProps) {
  * 获取未读通知数量
  * 用于判断是否显示红点
  */
-function getUnreadNotificationCount(): number {
-	// 注意：这里使用默认中文数据，因为这个函数在组件外部调用，无法获取当前 locale
-	// 实际项目中，可以考虑从 store 中读取 locale 或使用其他方式
-	const { locale } = useSystemStore.getState();
-	return getNotificationData(locale).filter((n) => !n.read).length;
-}
-
 // ==================== 聊天组件 ====================
 
 interface ChatListProps {
@@ -325,7 +282,7 @@ interface ChatListProps {
  */
 function ChatList({ onClose }: ChatListProps) {
 	const { locale } = useSystemStore();
-	const t = getI18nText(locale);
+	const t = getToolbarLocale(locale);
 
 	return (
 		<div style={{ width: '360px', padding: '48px 24px', textAlign: 'center' }}>
@@ -435,7 +392,6 @@ export const toolbarButtons: HeaderIconButton[] = [
 			trigger: 'click',
 			placement: 'bottomRight',
 			arrow: false,
-			shouldShowDot: () => getUnreadNotificationCount() > 0,
 		},
 	},
 	// 聊天按钮
@@ -453,14 +409,3 @@ export const toolbarButtons: HeaderIconButton[] = [
 		},
 	},
 ];
-
-/**
- * 获取按钮的国际化标签
- * @param labelKey 标签 key
- * @param locale 语言
- * @returns 国际化后的标签文本
- */
-export function getButtonLabel(labelKey: string, locale: Locale): string {
-	const labels = i18nConfig[locale]?.buttonLabels;
-	return labels?.[labelKey as keyof typeof labels] || labelKey;
-}

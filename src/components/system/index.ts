@@ -6,9 +6,11 @@
  */
 
 export { default as CachedOutlet } from '@/components/system/cached-outlet';
+export { default as ErrorBoundary } from '@/components/system/error-boundary';
 export { Logo } from '@/components/system/logo';
 export { default as ProtectedRoute } from '@/components/system/protected-route';
-export { default as SystemSettingsDrawer, useSystemSettingsDrawer } from '@/components/system/system-settings';
+export { useSystemSettingsDrawer } from '@/components/system/settings/use-system-settings-drawer';
+export { default as SystemSettingsDrawer } from '@/components/system/system-settings';
 export { default as TabContextMenu } from '@/components/system/tab-context-menu';
 export { default as TabsBar } from '@/components/system/tabs-bar';
 export { default as ThemeProvider } from '@/components/system/theme-provider';

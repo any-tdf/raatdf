@@ -5,6 +5,12 @@
 import type { Locale } from '@/locales/system/types';
 
 interface AuthLocale {
+	controls: {
+		themeColor: string;
+		language: string;
+		themeMode: string;
+		switchToLanguage: string;
+	};
 	login: {
 		title: string;
 		subtitle: string;
@@ -22,6 +28,8 @@ interface AuthLocale {
 		registerNow: string;
 		loginSuccess: string;
 		loginFailed: string;
+		forgotPasswordDemo: string;
+		forgotPasswordUnavailable: string;
 	};
 	register: {
 		title: string;
@@ -40,11 +48,7 @@ interface AuthLocale {
 		confirmPasswordPlaceholder: string;
 		confirmPasswordRequired: string;
 		passwordMismatch: string;
-		agreeTerms: string;
-		termsPrefix: string;
-		termsOfService: string;
-		and: string;
-		privacyPolicy: string;
+		agreementText: string;
 		agreeRequired: string;
 		registerButton: string;
 		registering: string;
@@ -52,10 +56,17 @@ interface AuthLocale {
 		loginNow: string;
 		registerSuccess: string;
 		registerFailed: string;
+		unavailable: string;
 	};
 }
 
 const zhCN: AuthLocale = {
+	controls: {
+		themeColor: '选择主题色',
+		language: '切换语言',
+		themeMode: '切换深浅模式',
+		switchToLanguage: '切换到',
+	},
 	login: {
 		title: '欢迎回来',
 		subtitle: '登录你的账户以继续',
@@ -73,6 +84,8 @@ const zhCN: AuthLocale = {
 		registerNow: '立即注册',
 		loginSuccess: '登录成功！',
 		loginFailed: '登录失败，请重试',
+		forgotPasswordDemo: '忘记密码？（演示）',
+		forgotPasswordUnavailable: '演示版本暂不支持找回密码',
 	},
 	register: {
 		title: '创建账户',
@@ -91,11 +104,7 @@ const zhCN: AuthLocale = {
 		confirmPasswordPlaceholder: '确认密码',
 		confirmPasswordRequired: '请确认密码！',
 		passwordMismatch: '两次输入的密码不一致！',
-		agreeTerms: '我已阅读并同意',
-		termsPrefix: '我已阅读并同意',
-		termsOfService: '服务条款',
-		and: '和',
-		privacyPolicy: '隐私政策',
+		agreementText: '我已阅读并同意服务条款和隐私政策',
 		agreeRequired: '请阅读并同意服务条款和隐私政策',
 		registerButton: '立即注册',
 		registering: '注册中...',
@@ -103,10 +112,17 @@ const zhCN: AuthLocale = {
 		loginNow: '立即登录',
 		registerSuccess: '注册成功！请登录',
 		registerFailed: '注册失败，请重试',
+		unavailable: '演示版本暂不支持注册功能',
 	},
 };
 
 const enUS: AuthLocale = {
+	controls: {
+		themeColor: 'Select theme color',
+		language: 'Switch language',
+		themeMode: 'Switch color mode',
+		switchToLanguage: 'Switch to',
+	},
 	login: {
 		title: 'Welcome Back',
 		subtitle: 'Sign in to your account to continue',
@@ -124,6 +140,8 @@ const enUS: AuthLocale = {
 		registerNow: 'Sign Up',
 		loginSuccess: 'Login successful!',
 		loginFailed: 'Login failed, please try again',
+		forgotPasswordDemo: 'Forgot password? (Demo)',
+		forgotPasswordUnavailable: 'Password recovery is unavailable in the demo',
 	},
 	register: {
 		title: 'Create Account',
@@ -142,11 +160,7 @@ const enUS: AuthLocale = {
 		confirmPasswordPlaceholder: 'Confirm password',
 		confirmPasswordRequired: 'Please confirm your password!',
 		passwordMismatch: 'Passwords do not match!',
-		agreeTerms: 'I have read and agree to the',
-		termsPrefix: 'I have read and agree to the',
-		termsOfService: 'Terms of Service',
-		and: 'and',
-		privacyPolicy: 'Privacy Policy',
+		agreementText: 'I have read and agree to the Terms of Service and Privacy Policy',
 		agreeRequired: 'Please read and agree to the Terms of Service and Privacy Policy',
 		registerButton: 'Sign Up',
 		registering: 'Signing up...',
@@ -154,6 +168,7 @@ const enUS: AuthLocale = {
 		loginNow: 'Sign In',
 		registerSuccess: 'Registration successful! Please sign in',
 		registerFailed: 'Registration failed, please try again',
+		unavailable: 'Registration is unavailable in the demo',
 	},
 };
 

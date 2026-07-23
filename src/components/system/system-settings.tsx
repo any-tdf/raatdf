@@ -1,11 +1,12 @@
 /**
- * 系统设置抽屉组件
+ * 系统设置抽屉组件。
  */
 import { Button, Drawer, Popconfirm } from 'antd';
-import { useState } from 'react';
+
 import { CONFIG_OPTIONS } from '@/config/system';
 import { getCommonLocale } from '@/locales';
 import { useSystemStore } from '@/store';
+
 import {
 	BorderRadiusSetting,
 	ContentWidthSetting,
@@ -75,7 +76,6 @@ function SettingsContent() {
 	const maxWidthValue = useMaxWidth({
 		menuLayout,
 		isFloatingUI,
-		showCollapseButton,
 		menuCollapsed,
 		fixedWidthMax,
 		setFixedWidthMax,
@@ -232,6 +232,7 @@ function SystemSettingsDrawer({ open, onClose }: SystemSettingsDrawerProps) {
 						<Button
 							type="text"
 							icon={<i className="ri-restart-line" style={{ fontSize: '16px' }} />}
+							aria-label={commonLocale.buttons.reset}
 							size="small"
 							style={{
 								width: '32px',
@@ -276,24 +277,6 @@ function SystemSettingsDrawer({ open, onClose }: SystemSettingsDrawerProps) {
 			<SettingsContent />
 		</Drawer>
 	);
-}
-
-// ==================== Hook ====================
-
-/**
- * 带有状态管理的系统设置抽屉 Hook
- */
-export function useSystemSettingsDrawer() {
-	const [open, setOpen] = useState(false);
-
-	const showDrawer = () => setOpen(true);
-	const hideDrawer = () => setOpen(false);
-
-	return {
-		open,
-		showDrawer,
-		hideDrawer,
-	};
 }
 
 export default SystemSettingsDrawer;

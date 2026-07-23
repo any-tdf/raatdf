@@ -1,6 +1,8 @@
 // 权限管理工具函数
 
-import { useUserStore } from '@/store';
+import type { MenuItem } from '@/api/mocks/menu';
+import { getAutoRoutes } from '@/router/auto-routes';
+import { useMenuStore, useUserStore } from '@/store';
 
 export interface UserPermission {
 	id: string;
@@ -39,9 +41,30 @@ export const hasAllPermissions = (permissions: string[]): boolean => {
 	return permissions.every((permission) => userPermissions.permissions.includes(permission));
 };
 
-// 检查页面访问权限（由后端菜单接口控制，前端默认允许访问）
-export const canAccessPage = (_pathname: string): boolean => {
-	// 页面权限由后端菜单接口控制
-	// 用户只能看到有权限的菜单项，无权限页面不会出现在菜单中
-	return true;
+const SYSTEM_PATHS = new Set(['/403', '/404', '/500', '/errors/403', '/errors/404', '/errors/500']);
+const KNOWN_PAGE_PATHS = new Set(getAutoRoutes().map((route) => `/${route.path}`));
+
+export const findMenuItemByPath = (items: MenuItem[], pathname: string): MenuItem | null => {
+	for (const item of items) {
+		if (item.path === pathname) return item;
+		if (item.children?.length) {
+			const child = findMenuItemByPath(item.children, pathname);
+			if (child) return child;
+		}
+	}
+
+	return null;
+};
+
+export const canAccessPage = (pathname: string): boolean => {
+	const normalizedPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+	if (normalizedPath === '/' || SYSTEM_PATHS.has(normalizedPath)) return true;
+
+	const item = findMenuItemByPath(useMenuStore.getState().menuData, normalizedPath);
+	if (!item) {
+		return !KNOWN_PAGE_PATHS.has(normalizedPath);
+	}
+
+	const role = useUserStore.getState().userInfo?.role;
+	return !item.roles?.length || (!!role && item.roles.includes(role));
 };

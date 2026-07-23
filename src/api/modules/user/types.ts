@@ -40,7 +40,7 @@ export interface UserInfo {
 	email?: string;
 	nickname?: string;
 	avatar?: string;
-	role: UserRole | string;
+	role: UserRole;
 	permissions: string[];
 	status?: UserStatus;
 	createdAt?: string;
@@ -83,7 +83,7 @@ export interface ChangePasswordRequest {
 export interface UserListParams {
 	username?: string;
 	email?: string;
-	role?: UserRole | string;
+	role?: UserRole;
 	status?: UserStatus;
 	current?: number;
 	pageSize?: number;

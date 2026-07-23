@@ -1,5 +1,8 @@
 import { create } from 'zustand';
+
 import type { UserRole } from '@/api/mocks/menu';
+
+export type AuthStatus = 'initializing' | 'anonymous' | 'authenticated';
 
 /**
  * 用户信息接口
@@ -10,7 +13,7 @@ export interface UserInfo {
 	/** 用户名 */
 	username: string;
 	/** 邮箱 */
-	email: string;
+	email?: string;
 	/** 昵称 */
 	nickname?: string;
 	/** 头像 URL */
@@ -29,9 +32,13 @@ export interface UserState {
 	userInfo: UserInfo | null;
 	/** 是否已登录 */
 	isLoggedIn: boolean;
+	/** 认证状态 */
+	authStatus: AuthStatus;
 
 	/** 设置用户信息 */
 	setUserInfo: (userInfo: UserInfo) => void;
+	/** 设置认证状态 */
+	setAuthStatus: (authStatus: AuthStatus) => void;
 	/** 清除用户信息（退出登录） */
 	clearUserInfo: () => void;
 	/** 更新用户头像 */
@@ -49,13 +56,19 @@ export const useUserStore = create<UserState>((set) => ({
 	// 初始状态
 	userInfo: null,
 	isLoggedIn: false,
+	authStatus: 'initializing',
 
 	// 设置用户信息
 	setUserInfo: (userInfo: UserInfo) => {
 		set({
 			userInfo,
 			isLoggedIn: true,
+			authStatus: 'authenticated',
 		});
+	},
+
+	setAuthStatus: (authStatus: AuthStatus) => {
+		set({ authStatus });
 	},
 
 	// 清除用户信息（退出登录）
@@ -63,6 +76,7 @@ export const useUserStore = create<UserState>((set) => ({
 		set({
 			userInfo: null,
 			isLoggedIn: false,
+			authStatus: 'anonymous',
 		});
 	},
 

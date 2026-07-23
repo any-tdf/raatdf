@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import Forbidden from '@/pages/errors/403';
+import { Spin } from 'antd';
+import { Navigate, useLocation } from 'react-router-dom';
+
+import { useMenuStore, useUserStore } from '@/store';
 import { canAccessPage } from '@/utils/permissions';
 
 interface ProtectedRouteProps {
@@ -8,43 +9,28 @@ interface ProtectedRouteProps {
 	path?: string;
 }
 
-function ProtectedRoute({ children, path }: ProtectedRouteProps) {
+const ProtectedRoute = ({ children, path }: ProtectedRouteProps) => {
 	const location = useLocation();
-	const [isChecking, setIsChecking] = useState(true);
-	const [hasAccess, setHasAccess] = useState(false);
+	const authStatus = useUserStore((state) => state.authStatus);
+	const isMenuReady = useMenuStore((state) => state.isReady);
 
-	useEffect(() => {
-		const checkAccess = () => {
-			const targetPath = path || location.pathname;
-
-			// 检查页面访问权限
-			const canAccess = canAccessPage(targetPath);
-			setHasAccess(canAccess);
-			setIsChecking(false);
-		};
-
-		checkAccess();
-	}, [location.pathname, path]);
-
-	// 权限检查中
-	if (isChecking) {
+	if (authStatus === 'initializing' || (authStatus === 'authenticated' && !isMenuReady)) {
 		return (
-			<div
-				className="flex min-h-screen items-center justify-center"
-				style={{ backgroundColor: 'var(--ant-color-bg-container)' }}
-			>
-				<div>检查权限中...</div>
+			<div className="flex min-h-screen items-center justify-center">
+				<Spin size="large" description="正在加载权限信息" />
 			</div>
 		);
 	}
 
-	// 无权限访问
-	if (!hasAccess) {
-		return <Forbidden />;
+	if (authStatus !== 'authenticated') {
+		return <Navigate to="/login" replace state={{ from: location }} />;
 	}
 
-	// 有权限，渲染子组件
-	return <>{children}</>;
-}
+	if (!canAccessPage(path ?? location.pathname)) {
+		return <Navigate to="/403" replace />;
+	}
+
+	return children;
+};
 
 export default ProtectedRoute;

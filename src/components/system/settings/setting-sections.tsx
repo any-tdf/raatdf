@@ -3,6 +3,7 @@
  */
 import type { ColorPickerProps } from 'antd';
 import { Button, ColorPicker, Divider, Select, Slider, Switch, Tooltip, Typography } from 'antd';
+
 import { FEATURE_FLAGS } from '@/config/system';
 import { SUPPORTED_LOCALES } from '@/locales';
 import type { BorderRadius, ContentWidth, MenuLayout, PageTransitionType, TabsStyle, ThemeMode } from '@/store';
@@ -59,7 +60,7 @@ export function IconButton({ icon, label, isActive, borderRadius, onClick }: Ico
 			onClick={onClick}
 		>
 			<i className={`${icon} text-xl ${isActive ? 'text-(--ant-color-primary)' : ''}`} />
-			<div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 transform whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-white text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+			<div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 transform rounded bg-gray-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 				{label}
 			</div>
 		</button>
@@ -175,7 +176,7 @@ export function PrimaryColorSetting({
 							<button
 								type="button"
 								key={color.value}
-								className="group relative flex h-4 max-h-4 min-h-4 w-4 min-w-4 max-w-4 shrink-0 cursor-pointer items-center justify-center border-0 p-0 transition-all duration-200"
+								className="group relative flex h-4 max-h-4 min-h-4 w-4 max-w-4 min-w-4 shrink-0 cursor-pointer items-center justify-center border-0 p-0 transition-all duration-200"
 								style={{
 									backgroundColor: color.value,
 									opacity: primaryColor === color.value ? 1 : 0.7,
@@ -191,9 +192,9 @@ export function PrimaryColorSetting({
 								title={color.label}
 							>
 								{primaryColor === color.value && (
-									<i className="ri-check-line -translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 font-black text-[10px] text-white" />
+									<i className="ri-check-line absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xs font-black text-white" />
 								)}
-								<div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 transform whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-white text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+								<div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 transform rounded bg-gray-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 									{color.label}
 								</div>
 							</button>
@@ -332,7 +333,7 @@ export function LanguageSetting({ locale, borderRadius, title }: LanguageSetting
 		// 使用 Zustand store 的 setLocale 方法
 		setLocale(newLocale);
 		// 重新加载菜单数据
-		loadMenuData(newLocale);
+		void loadMenuData(newLocale);
 	};
 
 	return (
@@ -357,7 +358,7 @@ export function LanguageSetting({ locale, borderRadius, title }: LanguageSetting
 							onClick={() => handleLanguageChange(option.value as Locale)}
 						>
 							<span className={`text-xl ${locale === option.value ? '' : 'grayscale-30'}`}>{option.flag}</span>
-							<div className="-translate-x-1/2 pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 transform whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-white text-xs opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+							<div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 transform rounded bg-gray-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 								{option.label}
 							</div>
 						</button>
@@ -387,14 +388,14 @@ export function BorderRadiusSetting({ borderRadius, locale, marks, setBorderRadi
 					{locale.title}
 				</Text>
 			</Divider>
-			<div className="mb-1">
+			<div className="mb-5">
 				<Slider
 					min={0}
 					max={24}
 					step={null}
 					value={borderRadius}
 					onChange={(value) => setBorderRadius(value as BorderRadius)}
-					className="m-0"
+					className="mx-0 mt-0"
 					marks={Object.fromEntries(marks.map((item) => [item.value, item.label]))}
 					tooltip={{ open: false }}
 				/>

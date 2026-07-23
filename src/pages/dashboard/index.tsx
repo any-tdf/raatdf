@@ -1,5 +1,6 @@
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import { Col, Progress, Row, Space, Tag } from 'antd';
+
 import { getDashboardLocale } from '@/locales';
 import { useSystemStore } from '@/store';
 
@@ -47,7 +48,7 @@ function Dashboard() {
 								<Tag color="success" icon={<i className="ri-arrow-up-line" />}>
 									12.5%
 								</Tag>
-								<span style={{ color: 'var(--ant-color-text-secondary)' }}>较上周</span>
+								<span style={{ color: 'var(--ant-color-text-secondary)' }}>{t.stats.comparedWithLastWeek}</span>
 							</Space>
 						),
 					}}
@@ -89,7 +90,7 @@ function Dashboard() {
 								<Tag color="success" icon={<i className="ri-arrow-up-line" />}>
 									8.2%
 								</Tag>
-								<span style={{ color: 'var(--ant-color-text-secondary)' }}>较上周</span>
+								<span style={{ color: 'var(--ant-color-text-secondary)' }}>{t.stats.comparedWithLastWeek}</span>
 							</Space>
 						),
 					}}
@@ -131,7 +132,7 @@ function Dashboard() {
 								<Tag color="success" icon={<i className="ri-arrow-up-line" />}>
 									15.3%
 								</Tag>
-								<span style={{ color: 'var(--ant-color-text-secondary)' }}>较上周</span>
+								<span style={{ color: 'var(--ant-color-text-secondary)' }}>{t.stats.comparedWithLastWeek}</span>
 							</Space>
 						),
 					}}
@@ -173,7 +174,7 @@ function Dashboard() {
 								<Tag color="error" icon={<i className="ri-arrow-down-line" />}>
 									2.1%
 								</Tag>
-								<span style={{ color: 'var(--ant-color-text-secondary)' }}>较上周</span>
+								<span style={{ color: 'var(--ant-color-text-secondary)' }}>{t.stats.comparedWithLastWeek}</span>
 							</Space>
 						),
 					}}
@@ -203,7 +204,7 @@ function Dashboard() {
 								<span>{t.systemPerformance.title}</span>
 							</Space>
 						}
-						bordered
+						variant="outlined"
 						headerBordered
 						style={{ borderRadius: `${borderRadius}px` }}
 					>
@@ -271,7 +272,7 @@ function Dashboard() {
 								<span>{t.businessTrends.title}</span>
 							</Space>
 						}
-						bordered
+						variant="outlined"
 						headerBordered
 						style={{ borderRadius: `${borderRadius}px` }}
 					>
@@ -282,7 +283,7 @@ function Dashboard() {
 									borderRadius: `${borderRadius}px`,
 									background: 'var(--ant-color-fill-quaternary)',
 								}}
-								bodyStyle={{ padding: '16px' }}
+								styles={{ body: { padding: '16px' } }}
 							>
 								<Statistic
 									title={
@@ -305,7 +306,7 @@ function Dashboard() {
 									borderRadius: `${borderRadius}px`,
 									background: 'var(--ant-color-fill-quaternary)',
 								}}
-								bodyStyle={{ padding: '16px' }}
+								styles={{ body: { padding: '16px' } }}
 							>
 								<Statistic
 									title={
@@ -328,7 +329,7 @@ function Dashboard() {
 									borderRadius: `${borderRadius}px`,
 									background: 'var(--ant-color-fill-quaternary)',
 								}}
-								bodyStyle={{ padding: '16px' }}
+								styles={{ body: { padding: '16px' } }}
 							>
 								<Statistic
 									title={
@@ -350,7 +351,7 @@ function Dashboard() {
 									borderRadius: `${borderRadius}px`,
 									background: 'var(--ant-color-fill-quaternary)',
 								}}
-								bodyStyle={{ padding: '16px' }}
+								styles={{ body: { padding: '16px' } }}
 							>
 								<Statistic
 									title={

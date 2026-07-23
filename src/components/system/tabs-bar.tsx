@@ -1,5 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { getCommonLocale } from '@/locales';
 import { type MenuItem, useMenuStore, useSystemStore } from '@/store';
 import { TabsStyle } from '@/store/types';
 
@@ -13,13 +15,23 @@ const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 /**
  * 多标签页组件
  */
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 需要处理多种标签页样式（默认、按钮、简洁、卡片）
 function TabsBar({ inHeader = false }: TabsBarProps) {
-	const { tabs, activeTabKey, borderRadius, isFloatingUI, tabsStyle, isDark, removeTab, setActiveTabKey, unpinTab } =
-		useSystemStore();
+	const {
+		tabs,
+		activeTabKey,
+		borderRadius,
+		isFloatingUI,
+		tabsStyle,
+		isDark,
+		locale,
+		removeTab,
+		setActiveTabKey,
+		unpinTab,
+	} = useSystemStore();
 	const { menuData } = useMenuStore();
 	const navigate = useNavigate();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const t = getCommonLocale(locale);
 
 	// 递归查找菜单项的辅助函数（返回完整对象）
 	const findMenuItemByPath = useCallback((items: MenuItem[], path: string): MenuItem | null => {
@@ -47,43 +59,23 @@ function TabsBar({ inHeader = false }: TabsBarProps) {
 	// 点击标签页
 	const handleTabClick = (key: string) => {
 		setActiveTabKey(key);
-		navigate(key);
+		void navigate(key);
 	};
 
 	// 关闭标签页
-	const handleTabClose = (e: React.MouseEvent, key: string) => {
+	const handleTabClose = (e: React.MouseEvent<HTMLButtonElement>, key: string) => {
 		e.stopPropagation();
-		const { tabs, activeTabKey } = useSystemStore.getState();
-
-		// 如果只剩一个标签页，不允许关闭
-		if (tabs.length <= 1) {
-			return;
-		}
-
-		// 计算关闭后应该激活的标签页
-		const closingIndex = tabs.findIndex((t) => t.key === key);
-		const isClosingActive = activeTabKey === key;
-
-		removeTab(key);
-
-		// 如果关闭的是当前激活的标签页，需要导航到新的激活标签页
-		if (isClosingActive) {
-			const newTabs = tabs.filter((t) => t.key !== key);
-			if (newTabs.length > 0) {
-				// 优先选择关闭标签页右边的，如果没有则选择左边的
-				const newActiveIndex = closingIndex >= newTabs.length ? newTabs.length - 1 : closingIndex;
-				navigate(newTabs[newActiveIndex].key);
-			}
-		}
+		const result = removeTab(key);
+		if (result.activePath) void navigate(result.activePath);
 	};
 
 	// 取消固定标签页
-	const handleUnpinTab = (_e: React.MouseEvent, key: string) => {
+	const handleUnpinTab = (e: React.MouseEvent<HTMLButtonElement>, key: string) => {
+		e.stopPropagation();
 		unpinTab(key);
 	};
 
 	// 获取标签页样式
-	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 需要处理多种标签页样式（默认、按钮、简洁、卡片）的复杂布局计算
 	const getTabStyle = (isActive: boolean, index: number, _total: number, activeIndex: number) => {
 		const baseStyle: React.CSSProperties = {
 			cursor: 'pointer',
@@ -233,142 +225,67 @@ function TabsBar({ inHeader = false }: TabsBarProps) {
 					height: inHeader ? '40px' : 'auto',
 				}}
 			>
-				{/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: 标签页项目渲染需要处理多种交互场景 */}
 				{tabs.map((tab, index) => {
 					const isActive = tab.key === activeTabKey;
 					const activeIndex = tabs.findIndex((t) => t.key === activeTabKey);
+					const actionButton = tab.closable !== false && tabs.length > 1 && (
+						<button
+							type="button"
+							className={`flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 transition-all ${inHeader ? 'text-xs' : 'text-sm'}`}
+							style={{ ...getActionButtonStyle(isActive), width: '16px', height: '16px' }}
+							onClick={(event) => (tab.pinned ? handleUnpinTab(event, tab.key) : handleTabClose(event, tab.key))}
+							onMouseEnter={(event) => {
+								event.currentTarget.style.backgroundColor =
+									(tabsStyle === TabsStyle.BUTTON || tabsStyle === TabsStyle.CARD) && isActive
+										? 'rgba(255, 255, 255, 0.2)'
+										: isDark
+											? 'rgba(255, 255, 255, 0.1)'
+											: 'rgba(0, 0, 0, 0.1)';
+							}}
+							onMouseLeave={(event) => {
+								event.currentTarget.style.backgroundColor = 'transparent';
+							}}
+							aria-label={tab.pinned ? t.tabContextMenu.unpinTab : t.tabContextMenu.closeTab}
+						>
+							<i className={tab.pinned ? 'ri-pushpin-fill' : 'ri-close-line'} aria-hidden="true" />
+						</button>
+					);
 					return (
-						<div key={tab.key} data-tab-key={tab.key} className="relative flex items-center">
-							{/* 主标签页按钮（包含关闭/固定按钮在内） */}
-							<button
-								type="button"
-								onClick={() => handleTabClick(tab.key)}
-								className="group flex cursor-pointer items-center gap-0.5 border-0 p-0"
+						<div key={tab.key} className="relative flex items-center">
+							<div
+								data-tab-key={tab.key}
+								className="group flex items-center gap-0.5"
 								style={getTabStyle(isActive, index, tabs.length, activeIndex)}
-								onMouseEnter={(e) => {
-									const bgColor = getTabButtonHoverBackground(isActive);
-									if (bgColor) {
-										e.currentTarget.style.backgroundColor = bgColor;
-									}
+								onMouseEnter={(event) => {
+									const background = getTabButtonHoverBackground(isActive);
+									if (background) event.currentTarget.style.backgroundColor = background;
 								}}
-								onMouseLeave={(e) => {
-									const bgColor = getTabButtonLeaveBackground(isActive);
-									if (bgColor) {
-										e.currentTarget.style.backgroundColor = bgColor;
-									}
+								onMouseLeave={(event) => {
+									const background = getTabButtonLeaveBackground(isActive);
+									if (background) event.currentTarget.style.backgroundColor = background;
 								}}
 							>
-								{/* Mac 系统：关闭/固定按钮在左侧 */}
-								{tab.closable !== false && tabs.length > 1 && isMac && (
-									// biome-ignore lint/a11y/useSemanticElements: 关闭按钮需要在主按钮内部，使用 span 避免嵌套 button
-									<span
-										role="button"
-										tabIndex={0}
-										className={`flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 transition-all ${inHeader ? 'text-xs' : 'text-sm'}`}
-										style={{
-											...getActionButtonStyle(isActive),
-											marginRight: '2px',
-											width: '16px',
-											height: '16px',
-										}}
-										onClick={(e) => {
-											e.stopPropagation();
-											if (tab.pinned) {
-												handleUnpinTab(e as unknown as React.MouseEvent, tab.key);
-											} else {
-												handleTabClose(e as unknown as React.MouseEvent, tab.key);
-											}
-										}}
-										onKeyDown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												e.stopPropagation();
-												if (tab.pinned) {
-													unpinTab(tab.key);
-												} else {
-													const mockEvent = { stopPropagation: () => {} } as React.MouseEvent;
-													handleTabClose(mockEvent, tab.key);
-												}
-											}
-										}}
-										onMouseEnter={(e) => {
-											if ((tabsStyle === TabsStyle.BUTTON || tabsStyle === TabsStyle.CARD) && isActive) {
-												(e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-											} else {
-												(e.currentTarget as HTMLElement).style.backgroundColor = isDark
-													? 'rgba(255, 255, 255, 0.1)'
-													: 'rgba(0, 0, 0, 0.1)';
-											}
-										}}
-										onMouseLeave={(e) => {
-											(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-										}}
-										aria-label={tab.pinned ? '取消固定标签页' : '关闭标签页'}
-									>
-										<i className={tab.pinned ? 'ri-pushpin-fill' : 'ri-close-line'} />
-									</span>
-								)}
-								{tab.icon && (
-									<i
-										className={`${tab.icon} ${inHeader ? 'text-xs' : 'text-sm'}`}
-										style={{
-											...((tabsStyle === TabsStyle.BUTTON || tabsStyle === TabsStyle.CARD) &&
-												isActive && { color: '#ffffff' }),
-										}}
-									/>
-								)}
-								<span>{getTabLabel(tab.key, tab.label)}</span>
-								{/* 非 Mac 系统：关闭/固定按钮在右侧 */}
-								{tab.closable !== false && tabs.length > 1 && !isMac && (
-									// biome-ignore lint/a11y/useSemanticElements: 关闭按钮需要在主按钮内部，使用 span 避免嵌套 button
-									<span
-										role="button"
-										tabIndex={0}
-										className={`flex cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 transition-all ${inHeader ? 'text-xs' : 'text-sm'}`}
-										style={{
-											...getActionButtonStyle(isActive),
-											marginLeft: '2px',
-											width: '16px',
-											height: '16px',
-										}}
-										onClick={(e) => {
-											e.stopPropagation();
-											if (tab.pinned) {
-												handleUnpinTab(e as unknown as React.MouseEvent, tab.key);
-											} else {
-												handleTabClose(e as unknown as React.MouseEvent, tab.key);
-											}
-										}}
-										onKeyDown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												e.stopPropagation();
-												if (tab.pinned) {
-													unpinTab(tab.key);
-												} else {
-													const mockEvent = { stopPropagation: () => {} } as React.MouseEvent;
-													handleTabClose(mockEvent, tab.key);
-												}
-											}
-										}}
-										onMouseEnter={(e) => {
-											if ((tabsStyle === TabsStyle.BUTTON || tabsStyle === TabsStyle.CARD) && isActive) {
-												(e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-											} else {
-												(e.currentTarget as HTMLElement).style.backgroundColor = isDark
-													? 'rgba(255, 255, 255, 0.1)'
-													: 'rgba(0, 0, 0, 0.1)';
-											}
-										}}
-										onMouseLeave={(e) => {
-											(e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-										}}
-										aria-label={tab.pinned ? '取消固定标签页' : '关闭标签页'}
-									>
-										<i className={tab.pinned ? 'ri-pushpin-fill' : 'ri-close-line'} />
-									</span>
-								)}
-							</button>
+								{isMac && actionButton}
+								<button
+									type="button"
+									onClick={() => handleTabClick(tab.key)}
+									className="flex cursor-pointer items-center gap-0.5 border-0 bg-transparent p-0 text-inherit"
+									role="tab"
+									aria-selected={isActive}
+								>
+									{tab.icon && (
+										<i
+											className={`${tab.icon} ${inHeader ? 'text-xs' : 'text-sm'}`}
+											style={{
+												...((tabsStyle === TabsStyle.BUTTON || tabsStyle === TabsStyle.CARD) &&
+													isActive && { color: '#ffffff' }),
+											}}
+										/>
+									)}
+									<span>{getTabLabel(tab.key, tab.label)}</span>
+								</button>
+								{!isMac && actionButton}
+							</div>
 							{/* 简洁式的分隔线 */}
 							{tabsStyle === TabsStyle.SIMPLE && index < tabs.length - 1 && (
 								<div

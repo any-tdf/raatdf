@@ -4,6 +4,7 @@ import axios, { type AxiosError, type AxiosInstance, type AxiosResponse, type In
 import type { Locale } from '@/locales';
 import { getCommonLocale } from '@/locales';
 import { useSystemStore } from '@/store';
+import { dispatchUnauthorized, getAuthToken } from '@/utils/auth-session';
 
 /**
  * HTTP 响应数据结构
@@ -37,7 +38,7 @@ export interface RequestConfig extends InternalAxiosRequestConfig {
  * API 基础配置
  */
 const API_CONFIG = {
-	baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+	baseURL: import.meta.env.VITE_API_BASE_URL,
 	timeout: 30000, // 默认超时时间 30 秒
 	withCredentials: true, // 允许跨域请求带上认证信息
 };
@@ -115,7 +116,7 @@ const httpClient: AxiosInstance = axios.create({
 httpClient.interceptors.request.use(
 	(config: RequestConfig) => {
 		// 获取存储的 token
-		const token = localStorage.getItem('auth_token');
+		const token = getAuthToken();
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`;
 		}
@@ -170,6 +171,9 @@ httpClient.interceptors.response.use(
 	},
 	(error: AxiosError) => {
 		const config = error.config as RequestConfig;
+		if (error.response?.status === 401) {
+			dispatchUnauthorized();
+		}
 
 		// 检查是否需要隐藏错误提示
 		if (config?.hideErrorMessage) {
@@ -188,12 +192,6 @@ httpClient.interceptors.response.use(
 
 			// 优先使用服务器返回的错误消息，其次使用本地化消息
 			errorMessage = errorData?.message || getErrorMessageByStatus(status, locale);
-
-			// 401 错误时清除 token
-			if (status === 401) {
-				localStorage.removeItem('auth_token');
-				// TODO: 重定向到登录页
-			}
 		} else if (error.request) {
 			// 请求已发出，但没有收到响应
 			errorMessage = getNetworkErrorMessage('connection', locale);

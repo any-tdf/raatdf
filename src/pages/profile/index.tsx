@@ -2,12 +2,13 @@ import type { ProDescriptionsActionType } from '@ant-design/pro-components';
 import { ProCard, ProDescriptions } from '@ant-design/pro-components';
 import { App, Avatar, Badge, Button, Col, Divider, Row, Space, Tag } from 'antd';
 import { useRef, useState } from 'react';
+
 import { getProfileLocale } from '@/locales';
 import { useSystemStore, useUserStore } from '@/store';
 
 interface UserProfile {
 	username: string;
-	email: string;
+	email?: string;
 	department: string;
 	position: string;
 	joinDate: string;
@@ -23,8 +24,8 @@ function Profile() {
 
 	// 模拟用户数据
 	const [profile, setProfile] = useState<UserProfile>({
-		username: userInfo?.username || 'admin',
-		email: userInfo?.email || 'admin@example.com',
+		username: userInfo!.username,
+		email: userInfo!.email,
 		department: 'Tech Department',
 		position: 'System Administrator',
 		joinDate: '2024-01-01',
@@ -39,7 +40,7 @@ function Profile() {
 				{/* 个人信息卡片 */}
 				<Col xs={24} lg={8}>
 					<ProCard
-						bordered
+						variant="outlined"
 						style={{
 							borderRadius: `${borderRadius}px`,
 							textAlign: 'center',
@@ -122,7 +123,7 @@ function Profile() {
 								<span>{t.basicInfo.title}</span>
 							</Space>
 						}
-						bordered
+						variant="outlined"
 						headerBordered
 						style={{ borderRadius: `${borderRadius}px` }}
 					>
@@ -187,7 +188,7 @@ function Profile() {
 								<span>{t.security.title}</span>
 							</Space>
 						}
-						bordered
+						variant="outlined"
 						headerBordered
 						style={{ borderRadius: `${borderRadius}px` }}
 					>
@@ -195,7 +196,7 @@ function Profile() {
 							<Col xs={24} md={12}>
 								<ProCard
 									hoverable
-									bordered
+									variant="outlined"
 									style={{
 										borderRadius: `${borderRadius}px`,
 										background: 'var(--ant-color-fill-quaternary)',
@@ -240,7 +241,7 @@ function Profile() {
 							<Col xs={24} md={12}>
 								<ProCard
 									hoverable
-									bordered
+									variant="outlined"
 									style={{
 										borderRadius: `${borderRadius}px`,
 										background: 'var(--ant-color-fill-quaternary)',

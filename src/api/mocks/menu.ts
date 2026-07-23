@@ -10,15 +10,20 @@ import type { Locale } from '@/store/types';
  */
 export type UserRole = 'admin' | 'user';
 
-export interface MenuItem {
+export interface RouteMeta {
+	/** 允许访问此路由的角色，不设置则所有角色都可访问 */
+	roles?: UserRole[];
+	/** 是否允许标签页缓存，默认允许 */
+	cache?: boolean;
+}
+
+export interface MenuItem extends RouteMeta {
 	key: string;
 	label: string;
 	icon?: string;
 	path?: string;
 	children?: MenuItem[];
 	component?: string;
-	/** 允许访问此菜单的角色，不设置则所有角色都可访问 */
-	roles?: UserRole[];
 }
 
 /**
@@ -51,6 +56,7 @@ const menuDataZhCN: MenuItem[] = [
 		children: [],
 		component: 'Docs',
 		roles: ['admin', 'user'],
+		cache: false,
 	},
 	{
 		key: 'examples',
@@ -137,6 +143,7 @@ const menuDataEnUS: MenuItem[] = [
 		children: [],
 		component: 'Docs',
 		roles: ['admin', 'user'],
+		cache: false,
 	},
 	{
 		key: 'examples',
@@ -239,7 +246,7 @@ const menuDataMap = {
  * @param role 用户角色，默认为 admin
  */
 export const getMenuData = (locale: Locale, role: UserRole = 'admin'): MenuItem[] => {
-	const fullMenu = menuDataMap[locale] || menuDataZhCN;
+	const fullMenu = menuDataMap[locale];
 	return filterMenuByRole(fullMenu, role);
 };
 

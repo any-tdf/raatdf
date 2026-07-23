@@ -1,6 +1,7 @@
 import { zhCNIntl } from '@ant-design/pro-components';
 import datePickerZhCN from 'antd/es/date-picker/locale/zh_CN';
 import zhCN from 'antd/locale/zh_CN';
+
 import type { LocalizationConfig } from './types';
 
 /**
@@ -124,6 +125,7 @@ const zhCNConfig: LocalizationConfig = {
 			systemSettings: '系统设置',
 		},
 		accountMenu: {
+			open: '打开账号菜单',
 			logout: '退出登录',
 			logoutConfirmTitle: '退出登录',
 			logoutConfirmContent: '确定要退出登录吗？',
@@ -134,14 +136,26 @@ const zhCNConfig: LocalizationConfig = {
 			noAccess: '您没有权限访问此页面',
 		},
 		tabContextMenu: {
+			actionsLabel: '标签页操作',
 			pin: '固定',
 			unpin: '取消固定',
+			closeTab: '关闭标签页',
+			unpinTab: '取消固定标签页',
 			closeLeft: '关闭左侧',
 			closeRight: '关闭右侧',
 			closeOthers: '关闭其他',
 		},
 		loading: {
 			checkingAuth: '检查登录状态中...',
+			loadingPage: '正在加载页面...',
+		},
+		docs: {
+			openExternal: '在新窗口打开',
+			loading: '正在加载项目文档',
+			timeoutTitle: '文档加载超时',
+			timeoutDescription: '可以重试加载，或在新窗口中直接打开文档站点。',
+			retry: '重新加载',
+			iframeTitle: 'RAATDF 项目文档',
 		},
 	},
 	config: {

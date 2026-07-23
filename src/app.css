@@ -1,5 +1,8 @@
-@import "tailwindcss";
-@import "remixicon/fonts/remixicon.css";
+@layer theme, base, antd, components, utilities;
+
+@import 'tailwindcss';
+@import 'antd/dist/antd.css' layer(antd);
+@import 'remixicon/fonts/remixicon.css' layer(components);
 
 /* ========================================
    Tailwind CSS v4 配置
@@ -9,6 +12,7 @@
    ======================================== */
 
 @theme {
+	--text-2xs: 0.625rem;
 	/* 动画配置 - 包含已使用和可能用到的动画 */
 	--animate-spin-hover: spin-hover 0.6s ease-in-out;
 	--animate-wiggle: wiggle 0.5s ease-in-out;
@@ -22,6 +26,41 @@
 	--animate-hop: hop 0.3s ease-out;
 	--animate-shake: shake 0.4s ease-in-out;
 	--animate-rubber-band: rubber-band 0.6s ease-in-out;
+}
+
+.origin-right-center {
+	transform-origin: right center;
+}
+
+.tab-context-menu {
+	z-index: 10000;
+	min-width: 8.75rem;
+	animation: tab-context-menu-in 160ms ease-out;
+}
+
+.tab-context-action {
+	cursor: pointer;
+	color: var(--ant-color-text);
+}
+
+.tab-context-action:hover:not(:disabled) {
+	background: var(--ant-color-fill-secondary);
+}
+
+.tab-context-action:disabled {
+	cursor: not-allowed;
+	color: var(--ant-color-text-disabled);
+}
+
+@keyframes tab-context-menu-in {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
 }
 
 /* ========================================
@@ -113,26 +152,26 @@ html.dark {
 }
 
 /* 可滚动元素 */
-[style*="overflow: auto"] {
+[style*='overflow: auto'] {
 	scrollbar-width: thin;
 	scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
 }
 
-[style*="overflow: auto"]::-webkit-scrollbar {
+[style*='overflow: auto']::-webkit-scrollbar {
 	width: 6px;
 	height: 4px;
 }
 
-[style*="overflow: auto"]::-webkit-scrollbar-track {
+[style*='overflow: auto']::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-[style*="overflow: auto"]::-webkit-scrollbar-thumb {
+[style*='overflow: auto']::-webkit-scrollbar-thumb {
 	background-color: rgba(0, 0, 0, 0.08);
 	border-radius: 3px;
 }
 
-[style*="overflow: auto"]::-webkit-scrollbar-thumb:hover {
+[style*='overflow: auto']::-webkit-scrollbar-thumb:hover {
 	background-color: rgba(0, 0, 0, 0.15);
 }
 
@@ -655,4 +694,9 @@ html.dark {
 
 .animate-rubber-band {
 	animation: rubber-band 0.6s ease-in-out;
+}
+
+.notification-item-button:hover,
+.notification-item-button:focus-visible {
+	background-color: var(--ant-color-fill-tertiary) !important;
 }

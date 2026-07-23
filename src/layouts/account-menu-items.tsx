@@ -7,6 +7,7 @@
  */
 
 import type { MenuProps } from 'antd';
+
 import type { Locale } from '@/locales';
 
 // ==================== 类型定义 ====================
@@ -24,7 +25,6 @@ export interface CommonLocale {
 		confirm: string;
 		cancel: string;
 	};
-	// biome-ignore lint/suspicious/noExplicitAny: 需要支持其他国际化键
 	[key: string]: any;
 }
 

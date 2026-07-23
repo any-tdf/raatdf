@@ -2,6 +2,7 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { DrawerForm, ProFormDatePicker, ProFormSelect, ProFormText, ProTable } from '@ant-design/pro-components';
 import { App, Button, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
+
 import type { Employee } from '@/api';
 import { employeeApi } from '@/api';
 import { getAntdLocale, getDatePickerLocale, getQueryTableLocale } from '@/locales';
@@ -38,7 +39,6 @@ function ExamplesQueryTable() {
 
 	const [drawerVisible, setDrawerVisible] = useState(false);
 	const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-	// biome-ignore lint/suspicious/noExplicitAny: ProTable actionRef 类型
 	const actionRef = useRef<any>(null);
 
 	// 获取当前语言的 DatePicker locale
@@ -242,7 +242,7 @@ function ExamplesQueryTable() {
 				initialValues={editingEmployee || {}}
 				layout="vertical"
 				drawerProps={{
-					destroyOnClose: true,
+					destroyOnHidden: true,
 				}}
 				submitter={{
 					searchConfig: {

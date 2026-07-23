@@ -1,17 +1,18 @@
-import { App, Button, Checkbox, Form, Input, Typography } from 'antd';
+import { Alert, App, Button, Checkbox, Form, Input, Typography } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getMenuData, type MenuItem } from '@/api/mocks/menu';
-import { userApi } from '@/api/modules/user';
+
 import { Logo } from '@/components/system';
 import { CONFIG_OPTIONS } from '@/config/system';
 import { getAuthLocale, getCommonLocale, SUPPORTED_LOCALES } from '@/locales';
-import { ThemeMode, useSystemStore, useUserStore } from '@/store';
+import { login } from '@/services/auth-service';
+import { ThemeMode, useSystemStore } from '@/store';
+import { LAST_USERNAME_KEY } from '@/utils/auth-session';
 
 interface LoginFormData {
 	username: string;
 	password: string;
-	remember?: boolean;
+	rememberMe: boolean;
 }
 
 // Orbiting Circles 配置 - 简化为两个圈
@@ -60,9 +61,9 @@ const TECH_STACK = [
 		size: 1,
 	},
 	{
-		name: 'Biome',
-		logo: '/logo/biome.svg',
-		color: '#60a5fa',
+		name: 'Vite+',
+		logo: '/logo/vite.svg',
+		color: '#646cff',
 		size: 1,
 	},
 	{
@@ -85,6 +86,9 @@ const TECH_STACK = [
 	},
 ];
 
+const INNER_ORBIT_TECHS = TECH_STACK.slice(0, 5);
+const OUTER_ORBIT_TECHS = TECH_STACK.slice(5);
+
 // 主题颜色类型
 interface ThemeColors {
 	primary: string;
@@ -94,11 +98,6 @@ interface ThemeColors {
 
 // Orbiting Circles 组件 - 同心圆围绕系统 logo
 const OrbitingCircles = ({ themeColors }: { themeColors: ThemeColors }) => {
-	// 随机分配技术栈到两个圈
-	const shuffledTechs = [...TECH_STACK].sort(() => Math.random() - 0.5);
-	const innerOrbitTechs = shuffledTechs.slice(0, 5); // 内圈 5 个
-	const outerOrbitTechs = shuffledTechs.slice(5, 9); // 外圈 4 个
-
 	// 轨道半径
 	const innerRadius = 120;
 	const outerRadius = 200;
@@ -134,7 +133,7 @@ const OrbitingCircles = ({ themeColors }: { themeColors: ThemeColors }) => {
 			/>
 
 			{/* 外圈技术 logo */}
-			{outerOrbitTechs.map((tech, index) => {
+			{OUTER_ORBIT_TECHS.map((tech, index) => {
 				const angle = index * 90; // 外圈 4 个，每个 90 度
 				return (
 					<div
@@ -168,7 +167,7 @@ const OrbitingCircles = ({ themeColors }: { themeColors: ThemeColors }) => {
 			})}
 
 			{/* 内圈技术 logo */}
-			{innerOrbitTechs.map((tech, index) => {
+			{INNER_ORBIT_TECHS.map((tech, index) => {
 				const angle = index * 72; // 内圈 5 个，每个 72 度
 				return (
 					<div
@@ -219,9 +218,7 @@ function Auth() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const [isLogin, setIsLogin] = useState(true);
-	const { themeMode, toggleTheme, primaryColor, setPrimaryColor, locale, setLocale, isDark, setMenuData } =
-		useSystemStore();
-	const { setUserInfo } = useUserStore();
+	const { themeMode, toggleTheme, primaryColor, setPrimaryColor, locale, setLocale, isDark } = useSystemStore();
 	const { message } = App.useApp();
 
 	// 获取当前语言的配置选项和多语言文本
@@ -236,9 +233,9 @@ function Auth() {
 	// 登录表单默认值
 	const loginDefaultValues = useMemo(
 		() => ({
-			username: 'admin',
+			username: localStorage.getItem(LAST_USERNAME_KEY) ?? 'admin',
 			password: '123456',
-			remember: true,
+			rememberMe: localStorage.getItem(LAST_USERNAME_KEY) !== null,
 		}),
 		[]
 	);
@@ -296,97 +293,24 @@ function Auth() {
 	// 登录表单提交
 	const onLoginFinish = async (values: LoginFormData) => {
 		setLoading(true);
-
-		// 调用登录 API
-		const loginResponse = await userApi.login({
-			username: values.username,
-			password: values.password,
-		});
-
-		if (!loginResponse.success || !loginResponse.data) {
-			message.error(t.login.loginFailed);
-			setLoading(false);
-			return;
-		}
-
-		const { accessToken } = loginResponse.data;
-
-		// 存储 token
-		localStorage.setItem('auth_token', accessToken);
-		localStorage.setItem('login_time', Date.now().toString());
-		localStorage.setItem('last_username', values.username);
-
-		// 获取用户信息
-		const profileResponse = await userApi.getProfile(accessToken);
-		if (!profileResponse.success || !profileResponse.data) {
-			message.error(t.login.loginFailed);
-			setLoading(false);
-			return;
-		}
-
-		const user = profileResponse.data;
-
-		// 保存用户信息到 Zustand store
-		setUserInfo({
-			username: user.username,
-			email: user.email || '',
-			role: user.role as 'admin' | 'user',
-			avatar: user.avatar,
-		});
-
-		// 获取菜单数据
-		const menuResponse = await userApi.getMenu(accessToken);
-		if (menuResponse.success && menuResponse.data) {
-			setMenuData(menuResponse.data);
-			const firstPath = getFirstMenuPath(menuResponse.data);
+		try {
+			const firstPath = await login(values);
 			message.success(t.login.loginSuccess);
-			navigate(firstPath);
-		} else {
-			// 获取菜单失败时使用默认菜单
-			const fallbackMenu = getMenuData(locale, user.role as 'admin' | 'user');
-			setMenuData(fallbackMenu);
-			const firstPath = getFirstMenuPath(fallbackMenu);
-			message.success(t.login.loginSuccess);
-			navigate(firstPath);
+			void navigate(firstPath);
+		} catch {
+			message.error(t.login.loginFailed);
+		} finally {
+			setLoading(false);
 		}
-
-		setLoading(false);
-	};
-
-	/**
-	 * 获取菜单中第一个有效路径
-	 * 递归查找第一个有 path 属性的菜单项
-	 */
-	const getFirstMenuPath = (items: MenuItem[]): string => {
-		for (const item of items) {
-			if (item.path) {
-				return item.path;
-			}
-			if (item.children && item.children.length > 0) {
-				const childPath = getFirstMenuPath(item.children);
-				if (childPath) {
-					return childPath;
-				}
-			}
-		}
-		return '/dashboard'; // 兜底默认路径
-	};
-
-	// 注册表单提交（仅用于展示）
-	const onRegisterFinish = async () => {
-		setLoading(true);
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		message.info('演示版本，暂不支持注册功能');
-		setLoading(false);
 	};
 
 	const toggleAuthMode = () => {
 		if (isLogin) {
 			setIsLogin(false);
-			navigate('/register');
+			void navigate('/register');
 		} else {
 			setIsLogin(true);
-			navigate('/login');
+			void navigate('/login');
 		}
 	};
 
@@ -434,8 +358,9 @@ function Auth() {
 				{/* 右上角工具栏 */}
 				<div className="absolute top-6 right-6 z-50 flex items-center gap-2">
 					{/* 主题色选择器 */}
-					<Button
-						type="text"
+					<div
+						aria-label={t.controls.themeColor}
+						role="group"
 						className="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-transparent"
 						style={{
 							border: 'none',
@@ -448,7 +373,7 @@ function Auth() {
 
 						{/* 颜色选择球 - hover 时展开 */}
 						<div
-							className="-translate-y-1/2 invisible absolute top-1/2 right-full mr-2 flex origin-[right_center] translate-x-4 transform items-center gap-1 rounded-full p-2 opacity-0 shadow-md transition-all duration-300 group-hover:visible group-hover:translate-x-0 group-hover:opacity-100"
+							className="origin-right-center invisible absolute top-1/2 right-full mr-2 flex translate-x-4 -translate-y-1/2 transform items-center gap-1 rounded-full p-2 opacity-0 shadow-md transition-all duration-300 group-hover:visible group-hover:translate-x-0 group-hover:opacity-100"
 							style={{
 								backgroundColor: 'transparent',
 								boxShadow: isDark ? '0 2px 8px rgba(255, 255, 255, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -465,9 +390,10 @@ function Auth() {
 										transitionDelay: `${index * 30}ms`,
 									}}
 									onClick={(e) => {
-										e?.stopPropagation?.();
+										e.stopPropagation();
 										setPrimaryColor(color.value);
 									}}
+									aria-label={`使用${color.label}主题色`}
 									onMouseEnter={(e) => {
 										e.currentTarget.style.opacity = '1';
 									}}
@@ -477,16 +403,17 @@ function Auth() {
 									title={color.label}
 								>
 									{getCurrentPresetTheme()?.value === color.value && (
-										<i className="ri-check-line -translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 font-black text-base text-white" />
+										<i className="ri-check-line absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-black text-white" />
 									)}
 								</button>
 							))}
 						</div>
-					</Button>
+					</div>
 
 					{/* 语言切换器 */}
-					<Button
-						type="text"
+					<div
+						aria-label={t.controls.language}
+						role="group"
 						className="group relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:bg-transparent"
 						style={{
 							border: 'none',
@@ -499,7 +426,7 @@ function Auth() {
 
 						{/* 语言选择 - hover 时向下展开 */}
 						<div
-							className="-translate-y-2 invisible absolute top-full right-0 mt-2 flex origin-top transform flex-col gap-1 rounded-lg p-2 opacity-0 shadow-md transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
+							className="invisible absolute top-full right-0 mt-2 flex origin-top -translate-y-2 transform flex-col gap-1 rounded-lg p-2 opacity-0 shadow-md transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100"
 							style={{
 								backgroundColor: 'var(--ant-color-bg-elevated)',
 								boxShadow: isDark ? '0 4px 12px rgba(255, 255, 255, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -516,9 +443,10 @@ function Auth() {
 										transitionDelay: `${index * 50}ms`,
 									}}
 									onClick={(e) => {
-										e?.stopPropagation?.();
+										e.stopPropagation();
 										setLocale(lang.value);
 									}}
+									aria-label={`${t.controls.switchToLanguage} ${lang.label}`}
 									onMouseEnter={(e) => {
 										if (locale !== lang.value) {
 											e.currentTarget.style.backgroundColor = 'var(--ant-color-bg-text-hover)';
@@ -531,7 +459,7 @@ function Auth() {
 								>
 									<span className="text-sm">{lang.flag}</span>
 									<span
-										className="whitespace-nowrap text-sm"
+										className="text-sm whitespace-nowrap"
 										style={{
 											color: locale === lang.value ? 'var(--ant-color-primary)' : 'var(--ant-color-text)',
 										}}
@@ -544,13 +472,14 @@ function Auth() {
 								</button>
 							))}
 						</div>
-					</Button>
+					</div>
 
 					{/* 深浅模式切换 */}
 					<Button
 						type="text"
 						icon={<i className={`${getThemeIcon()} text-lg`} />}
 						onClick={toggleTheme}
+						aria-label={t.controls.themeMode}
 						className="hover:bg-transparent"
 						style={{
 							display: 'flex',
@@ -656,11 +585,11 @@ function Auth() {
 
 									<Form.Item>
 										<div className="flex items-center justify-between">
-											<Form.Item name="remember" valuePropName="checked" noStyle>
+											<Form.Item name="rememberMe" valuePropName="checked" noStyle>
 												<Checkbox>{t.login.rememberMe}</Checkbox>
 											</Form.Item>
-											<Typography.Text className="cursor-pointer text-sm" style={{ fontSize: '14px' }}>
-												{t.login.forgotPassword}
+											<Typography.Text disabled title={t.login.forgotPasswordUnavailable} style={{ fontSize: '14px' }}>
+												{t.login.forgotPasswordDemo}
 											</Typography.Text>
 										</div>
 									</Form.Item>
@@ -718,7 +647,8 @@ function Auth() {
 								</div>
 
 								{/* 注册表单 */}
-								<Form name="register" onFinish={onRegisterFinish} layout="vertical" size="large">
+								<Alert className="mb-4" type="info" showIcon title={t.register.unavailable} />
+								<Form name="register" layout="vertical" size="large" disabled>
 									<Form.Item
 										name="username"
 										rules={[
@@ -785,16 +715,13 @@ function Auth() {
 										]}
 									>
 										<Checkbox>
-											<Typography.Text>{t.register.termsPrefix}</Typography.Text>
-											<Typography.Text>{t.register.termsOfService}</Typography.Text>
-											{t.register.and}
-											<Typography.Text>{t.register.privacyPolicy}</Typography.Text>
+											<Typography.Text>{t.register.agreementText}</Typography.Text>
 										</Checkbox>
 									</Form.Item>
 
 									<Form.Item>
-										<Button type="primary" htmlType="submit" loading={loading} block className="h-10 rounded-lg">
-											{loading ? t.register.registering : t.register.registerButton}
+										<Button type="primary" htmlType="button" disabled block className="h-10 rounded-lg">
+											{t.register.registerButton}
 										</Button>
 									</Form.Item>
 								</Form>

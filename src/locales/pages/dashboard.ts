@@ -11,6 +11,7 @@ interface DashboardLocale {
 		orderCount: string;
 		customerCount: string;
 		productCount: string;
+		comparedWithLastWeek: string;
 	};
 	systemPerformance: {
 		title: string;
@@ -34,6 +35,7 @@ const zhCN: DashboardLocale = {
 		orderCount: '订单数量',
 		customerCount: '客户总数',
 		productCount: '产品数量',
+		comparedWithLastWeek: '较上周',
 	},
 	systemPerformance: {
 		title: '系统性能',
@@ -57,6 +59,7 @@ const enUS: DashboardLocale = {
 		orderCount: 'Order Count',
 		customerCount: 'Total Customers',
 		productCount: 'Product Count',
+		comparedWithLastWeek: 'vs. last week',
 	},
 	systemPerformance: {
 		title: 'System Performance',
